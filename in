@@ -70,7 +70,7 @@ code main
 
 code incn
   {
-  return x + n; code
+  return x + n;
   }
 
 code hello ;

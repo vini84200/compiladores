@@ -74,15 +74,21 @@ int printLineErr(const int line_number) {
 int printLineErrWithPtr(const int line_number, const int ch, const char *ptr_text) {
     // Print the line where the error occurred with a pointer to the char
     char line[MAX_LINE_FOR_REPORT];
+    char prev_line[MAX_LINE_FOR_REPORT];
+    char next_line[MAX_LINE_FOR_REPORT];
+    // TODO: get the line before and after the error without rescaning the file
     char *line_read = getLine(line, line_number);
+    char *prev_line_read = getLine(prev_line, line_number - 1);
+    char *next_line_read = getLine(next_line, line_number + 1);
     if (line_read != NULL) {
-        fprintf(stderr, "\t%5d | ...\n", line_number - 1);
+        fprintf(stderr, "\t%5d | %s\n", line_number - 1, prev_line_read);
         fprintf(stderr, "\t%5d | %s\n", line_number, line_read);
         fprintf(stderr, "\t      | ");
         for (int i = 1; i < ch; i++) {
             fprintf(stderr, " ");
         }
         fprintf(stderr, "^ %s\n", ptr_text);
+        fprintf(stderr, "\t%5d | %s\n", line_number + 1, next_line_read);
         return 0;
     } else {
         fprintf(stderr, "Line not found\n");
@@ -94,9 +100,14 @@ int printLineErrWithHighlight(const int line_number, const int ch, const int cou
         return printLineErrWithPtr(line_number, ch, ptr_text);
     }
     char line[MAX_LINE_FOR_REPORT];
+    char prev_line[MAX_LINE_FOR_REPORT];
+    char next_line[MAX_LINE_FOR_REPORT];
+    // TODO: get the line before and after the error without rescaning the file
     char *line_read = getLine(line, line_number);
+    char *prev_line_read = getLine(prev_line, line_number - 1);
+    char *next_line_read = getLine(next_line, line_number + 1);
     if (line_read != NULL) {
-        fprintf(stderr, "\t%5d | ...\n", line_number - 1);
+        fprintf(stderr, "\t%5d | %s\n", line_number - 1, prev_line_read);
         fprintf(stderr, "\t%5d | %s\n", line_number, line_read);
         fprintf(stderr, "\t      | ");
         for (int i = 1; i < ch; i++) {
@@ -106,6 +117,7 @@ int printLineErrWithHighlight(const int line_number, const int ch, const int cou
             fprintf(stderr, "~");
         }
         fprintf(stderr, " %s\n", ptr_text);
+        fprintf(stderr, "\t%5d | %s\n", line_number + 1, next_line_read);
         return 0;
     } else {
         fprintf(stderr, "Line not found\n");
