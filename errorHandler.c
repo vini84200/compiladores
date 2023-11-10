@@ -14,24 +14,42 @@
 #include <stdlib.h>
 #include <string.h>
 
+int handle_wrong_arg_count(void) {
+    fprintf(stderr, "call: ./etapa2 input.txt \n");
+    exit(WRONG_ARG_COUNT_ERR);
+}
+int handle_cannot_open_file(char *argv) {
+    fprintf(stderr, "[ERROR] Cannot open file %s... \n", argv);
+    exit(CANNOT_OPEN_FILE_ERR);
+}
+int handleUnrecognizedToken(char token, int line) {
+    fprintf(stderr, "[ERROR] Token '%c' not recognized at %d:%d\n", token, line, getCollumn());
+    printLineErrWithPtr(line, getCollumn(), "Unrecognized token");
 
+}
+
+void handle_unknown_error(const char *s) {
+    fprintf(stderr, "[ERROR] Line %d: %s\n", getLineNumber(), s);
+    fprintf(stderr, "Unknow error\n");
+    exit(UNKNOW_ERROR);
+}
 void yyerror(const char *s) {
     if (strcmp(s, "syntax error") == 0) {
-        handleSyntaxError();
+        handle_syntax_error();
     } else {
-        fprintf(stderr, "Line %d: %s\n", getLineNumber(), s);
-        fprintf(stderr, "Unknow error\n");
-        exit(UNKNOW_ERROR);
+        handle_unknown_error(s);
     }
 }
 
-char *getLine(char *line, int lineNumber) {
+char *getLine(char *line, const int line_number) {
     extern FILE *yyin;
     FILE *file = yyin;
     int lineCount = 1;
     rewind(file);
     while (fgets(line, MAX_LINE_FOR_REPORT, file) != NULL) {
-        if (lineCount == lineNumber) {
+        if (lineCount == line_number) {
+            // Remove the \n from the end of the line
+            line[strcspn(line, "\n")] = 0;
             return line;
         }
         lineCount++;
@@ -39,13 +57,13 @@ char *getLine(char *line, int lineNumber) {
     return NULL;
 }
 
-int printLineErr(int lineNumber) {
+int printLineErr(const int line_number) {
     char line[MAX_LINE_FOR_REPORT];
-    char *lineRead = getLine(line, lineNumber);
-    if (lineRead != NULL) {
-        fprintf(stderr, "\t ...| \n");
-        fprintf(stderr, "\t %d | %s\n", lineNumber, lineRead);
-        fprintf(stderr, "\t ...| \n");
+    char *line_read = getLine(line, line_number);
+    if (line_read != NULL) {
+        fprintf(stderr, "\t  ... | \n");
+        fprintf(stderr, "\t%5d | %s\n", line_number, line_read);
+        fprintf(stderr, "\t  ... | \n");
     } else {
         fprintf(stderr, "Line not found\n");
     }
@@ -53,11 +71,54 @@ int printLineErr(int lineNumber) {
     return 0;
 }
 
-void handleSyntaxError() {
+int printLineErrWithPtr(const int line_number, const int ch, const char *ptr_text) {
+    // Print the line where the error occurred with a pointer to the char
+    char line[MAX_LINE_FOR_REPORT];
+    char *line_read = getLine(line, line_number);
+    if (line_read != NULL) {
+        fprintf(stderr, "\t%5d | ...\n", line_number - 1);
+        fprintf(stderr, "\t%5d | %s\n", line_number, line_read);
+        fprintf(stderr, "\t      | ");
+        for (int i = 1; i < ch; i++) {
+            fprintf(stderr, " ");
+        }
+        fprintf(stderr, "^ %s\n", ptr_text);
+        return 0;
+    } else {
+        fprintf(stderr, "Line not found\n");
+        return 1;
+    }
+}
+int printLineErrWithHighlight(const int line_number, const int ch, const int count, const char *ptr_text) {
+    if (count <= 1) {
+        return printLineErrWithPtr(line_number, ch, ptr_text);
+    }
+    char line[MAX_LINE_FOR_REPORT];
+    char *line_read = getLine(line, line_number);
+    if (line_read != NULL) {
+        fprintf(stderr, "\t%5d | ...\n", line_number - 1);
+        fprintf(stderr, "\t%5d | %s\n", line_number, line_read);
+        fprintf(stderr, "\t      | ");
+        for (int i = 1; i < ch; i++) {
+            fprintf(stderr, " ");
+        }
+        for (int i = 0; i < count; i++) {
+            fprintf(stderr, "~");
+        }
+        fprintf(stderr, " %s\n", ptr_text);
+        return 0;
+    } else {
+        fprintf(stderr, "Line not found\n");
+        return 1;
+    }
+}
+
+void handle_syntax_error() {
     // Print the line where the error occurred
-    fprintf(stderr, "Syntax error at line %d\n", getLineNumber());
+    fprintf(stderr, "[ERROR] Syntax error at line %d\n", getLineNumber());
 
     // Read the line where the error occurred
-    printLineErr(getLineNumber());
-    exit(SYNTAX_ERROR);
+    // printLineErr(getLineNumber());
+    printLineErrWithHighlight(getLineNumber(), getCollumn(), yyleng, "Syntax error");
+    exit(SYNTAX_ERROR_ERR);
 }

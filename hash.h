@@ -7,9 +7,10 @@
 
 #ifndef SCANNER_TEST_HASH_H
 #define SCANNER_TEST_HASH_H
+#include "symbols.h"
 
 typedef struct HashEntry {
-    int type;
+    SymbolType type;
     char *value;
     struct HashEntry *next;
 } HashEntry;

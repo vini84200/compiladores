@@ -21,7 +21,7 @@ void hashPrint(HashTable *table) {
            table->collisions);
     for (i = 0; i < table->size; i++) {
         for (entry = table->entries[i]; entry != NULL; entry = entry->next) {
-            printf("symbolTable[%d] = %s (type %d)\n", i, entry->value, entry->type);
+            printf("symbolTable[%d] = %s (type %s)\n", i, entry->value, getSymbolName(entry->type));
         }
     }
 }

@@ -7,9 +7,7 @@
 // +--------------------------------------------------------------------------+
 //
 
-#include "lib.h"
-#include "y.tab.h"
-#include "hash.h"
+#include "scannerDefinitions.h"
 %}
 
 %x MULTILINECOMMENT
@@ -20,7 +18,7 @@
 
 <MULTILINECOMMENT>"\\\\\\"      {BEGIN (INITIAL);}
 <MULTILINECOMMENT>.             {}
-<MULTILINECOMMENT>\n            {}
+<MULTILINECOMMENT>\n            {resetCollumn();}
 "\/\/\/".*              {BEGIN(MULTILINECOMMENT);}
 
 \/\/.*                  {}
@@ -46,29 +44,33 @@ return      {return KW_RETURN;}
 [-,;()\[\]{}=+*\/%<>&|~] {return yytext[0];}
 
 [0-9]+  {
-                hashInsert(getSymbolTable(), LIT_INT, yytext);
+                hashInsert(getSymbolTable(), SYMBOL_LIT_INT, yytext);
                 return LIT_INT;
 }
 [0-9]+\.[0-9]+  {
-                hashInsert(getSymbolTable(), LIT_REAL, yytext);
+                hashInsert(getSymbolTable(), SYMBOL_LIT_FLOAT, yytext);
                   return LIT_REAL;
 }
 \'(\\.|.)\'           {
-                hashInsert(getSymbolTable(), LIT_CHAR, yytext);
+                hashInsert(getSymbolTable(), SYMBOL_LIT_CHAR, yytext);
                   return LIT_CHAR;
 }
 \"(\\.|[^"])*\"      {
-                hashInsert(getSymbolTable(), LIT_STRING, yytext);
+                hashInsert(getSymbolTable(), SYMBOL_LIT_STRING, yytext);
                   return LIT_STRING;
 }
 
 [a-zA-Z0-9_]+  {
-                hashInsert(getSymbolTable(), TK_IDENTIFIER, yytext);
+                hashInsert(getSymbolTable(), SYMBOL_IDENTIFIER, yytext);
                 return TK_IDENTIFIER;
                }
 
-[ \t\n]       {}
-.           {printf("Possivel erro: %c", yytext[0]); return TOKEN_ERROR;}
+[ \t]       {}
+\n          {resetCollumn();}
+.           {
+            handleUnrecognizedToken(yytext[0], yylineno);
+            return TOKEN_ERROR;
+}
 
 %%
 

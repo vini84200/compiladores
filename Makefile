@@ -19,8 +19,8 @@ debug: all
 run: all
 	@(./etapa1 in)
 
-etapa2: lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o
-	$(CC) -o etapa2 lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o
+etapa2: lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o
+	$(CC) -o etapa2 lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o
 main.o: main.c
 	$(CC) -c main.c
 hash.o: hash.c
@@ -34,7 +34,7 @@ y.tab.o: y.tab.c
 y.tab.c y.tab.h: parser.y
 	$(YACC) parser.y
 
-lex.yy.o: lex.yy.c hash.h lib.h y.tab.h
+lex.yy.o: lex.yy.c hash.h lib.h y.tab.h errorHandler.h symbols.h
 	$(CC) -c lex.yy.c
 
 lex.yy.c: scanner.l
@@ -42,6 +42,9 @@ lex.yy.c: scanner.l
 
 errorHandler.o: errorHandler.c errorHandler.h
 	$(CC) -c errorHandler.c
+
+symbols.o: symbols.c symbols.h
+	$(CC) -c symbols.c
 
 
 .PHONY: clean
