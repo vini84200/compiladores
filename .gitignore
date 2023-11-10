@@ -1,0 +1,6 @@
+*.o
+etapa2
+*.yy.c
+*.tab.c
+*.tab.h
+y.output
