@@ -6,10 +6,15 @@
 // +--------------------------------------------------------------------------+
 //
   #include <stdio.h>
+  #include "hash.h"
   int yylex (void);
   void yyerror (char const *);
 %}
 
+%union
+{
+  HashEntry *symbol;
+}
 
 
 %token KW_CHAR
@@ -30,12 +35,12 @@
 %token OPERATOR_EQ
 %token OPERATOR_DIF
 
-%token TK_IDENTIFIER
+%token <symbol> TK_IDENTIFIER
 
-%token LIT_INT
-%token LIT_REAL
-%token LIT_CHAR
-%token LIT_STRING
+%token <symbol>LIT_INT
+%token<symbol>LIT_REAL
+%token<symbol>LIT_CHAR
+%token<symbol>LIT_STRING
 
 %token TOKEN_ERROR
 

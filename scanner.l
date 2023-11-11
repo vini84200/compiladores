@@ -44,24 +44,24 @@ return      {return KW_RETURN;}
 [-,;()\[\]{}=+*\/%<>&|~] {return yytext[0];}
 
 [0-9]+  {
-                hashInsert(getSymbolTable(), SYMBOL_LIT_INT, yytext);
+                yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_INT, yytext);
                 return LIT_INT;
 }
 [0-9]+\.[0-9]+  {
-                hashInsert(getSymbolTable(), SYMBOL_LIT_FLOAT, yytext);
+                yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_FLOAT, yytext);
                   return LIT_REAL;
 }
 \'(\\.|.)\'           {
-                hashInsert(getSymbolTable(), SYMBOL_LIT_CHAR, yytext);
+                yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_CHAR, yytext);
                   return LIT_CHAR;
 }
 \"(\\.|[^"])*\"      {
-                hashInsert(getSymbolTable(), SYMBOL_LIT_STRING, yytext);
+                yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_STRING, yytext);
                   return LIT_STRING;
 }
 
 [a-zA-Z0-9_]+  {
-                hashInsert(getSymbolTable(), SYMBOL_IDENTIFIER, yytext);
+                yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_IDENTIFIER, yytext);
                 return TK_IDENTIFIER;
                }
 

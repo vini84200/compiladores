@@ -1,0 +1,8 @@
+.tarignore
+.git
+.idea
+.gitignore
+*.o
+in
+*.tgz
+generateTarAndUpload.sh

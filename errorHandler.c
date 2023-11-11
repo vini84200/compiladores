@@ -25,7 +25,7 @@ int handle_cannot_open_file(char *argv) {
 int handleUnrecognizedToken(char token, int line) {
     fprintf(stderr, "[ERROR] Token '%c' not recognized at %d:%d\n", token, line, getCollumn());
     printLineErrWithPtr(line, getCollumn(), "Unrecognized token");
-
+    exit(SYNTAX_ERROR_ERR);
 }
 
 void handle_unknown_error(const char *s) {

@@ -76,3 +76,8 @@ code incn
 code hello ;
 code prsd if (x==12& y >= 123) print "oisad";
 code prsd if (x==12& y >= 123) print "oisad"; else {;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;}
+
+
+code 1nvalid0 {
+    return x + nautilo;
+  }

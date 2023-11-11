@@ -29,5 +29,5 @@ int main(int argc, char **argv) {
     yyparse();
     printf("Leitura concluída com sucesso!\n");
     hashPrint(getSymbolTable());
-
+    return 0;
 }

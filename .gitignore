@@ -4,3 +4,4 @@ etapa2
 *.tab.c
 *.tab.h
 y.output
+*.tgz

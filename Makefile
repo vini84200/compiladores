@@ -49,4 +49,4 @@ symbols.o: symbols.c symbols.h
 
 .PHONY: clean
 clean:
-	rm *.o lex.yy.c etapa2 lex.yy.h y.tab.c y.tab.h y.output
+	rm *.o lex.yy.c etapa2 y.tab.c y.tab.h y.output
