@@ -43,26 +43,26 @@ return      {return KW_RETURN;}
 
 [-,;()\[\]{}=+*\/%<>&|~] {return yytext[0];}
 
-[0-9]+  {
-                yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_INT, yytext);
-                return LIT_INT;
-}
+[0-9]+          {
+                    yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_INT, yytext);
+                    return LIT_INT;
+                }
 [0-9]+\.[0-9]+  {
-                yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_FLOAT, yytext);
-                  return LIT_REAL;
-}
-\'(\\.|.)\'           {
-                yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_CHAR, yytext);
-                  return LIT_CHAR;
-}
+                    yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_FLOAT, yytext);
+                    return LIT_REAL;
+                }
+\'(\\.|.)\'     {
+                    yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_CHAR, yytext);
+                    return LIT_CHAR;
+                }
 \"(\\.|[^"])*\"      {
-                yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_STRING, yytext);
-                  return LIT_STRING;
-}
+                        yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_STRING, yytext);
+                        return LIT_STRING;
+                     }
 
 [a-zA-Z0-9_]+  {
-                yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_IDENTIFIER, yytext);
-                return TK_IDENTIFIER;
+                   yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_IDENTIFIER, yytext);
+                   return TK_IDENTIFIER;
                }
 
 [ \t]       {}

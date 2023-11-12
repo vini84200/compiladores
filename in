@@ -19,8 +19,8 @@ int a=0;
 
 int main();
 int incn (int x, int n );
-float sdfhasd(char a, char b, int c, float d);
-float 1nvalid0 (int x, int n );
+//float sdfhasd(char a, char b, int c, float d);
+//float 1nvalid0 (int x, int n );
 
 ///
 Este eh um comentario
@@ -73,11 +73,12 @@ code incn
   return x + n;
   }
 
-code hello ;
-code prsd if (x==12& y >= 123) print "oisad";
-code prsd if (x==12& y >= 123) print "oisad"; else {;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;}
+//code hello ;
+//code prsd if (x==12& y >= 123) print "oisad";
+//code prsd if (x==12& y >= 123) print "oisad"; else {;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;}
 
 
-code 1nvalid0 {
+///code 1nvalid0 {
     return x + nautilo;
   }
+\\\
