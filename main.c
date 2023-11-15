@@ -6,13 +6,13 @@
 //
 
 #include "errorHandler.h"
+#include "lex.yy.h"
 #include "lib.h"
 #include "y.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 // lex.yy.h
-extern FILE *yyin;
 int yyparse();
 
 
@@ -24,8 +24,8 @@ int main(int argc, char **argv) {
         return handle_cannot_open_file(argv[1]);
     }
 
-    printf("Iniciando parser...\n");
     initSymbolTable();
+    printf("Iniciando parser...\n");
     yyparse();
     printf("Leitura concluída com sucesso!\n");
     hashPrint(getSymbolTable());

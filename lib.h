@@ -9,6 +9,7 @@
 #define LIB_HEADER
 
 #include "hash.h"
+#include "lex.yy.h"
 
 int getLineNumber(void);
 int getCollumn(void);
@@ -20,8 +21,5 @@ HashTable *getSymbolTable();
 void resetCollumn(void);
 void incrementCollumn(int increment);
 
-extern int yylineno;
-extern int running;
-extern int yyleng;
 
 #endif// !LIB_HEADER

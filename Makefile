@@ -9,7 +9,7 @@
 
 LEX = lex
 YACC = yacc -d -v
-CC = gcc -Wall
+CC = gcc -Wall -std=c99
 
 all: etapa2
 
@@ -17,7 +17,7 @@ debug: CC += -DDEBUG -g -O3
 debug: all
 
 run: all
-	@(./etapa1 in)
+	@(./etapa2 in)
 
 etapa2: lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o
 	$(CC) -o etapa2 lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o
@@ -37,8 +37,8 @@ y.tab.c y.tab.h: parser.y
 lex.yy.o: lex.yy.c hash.h lib.h y.tab.h errorHandler.h symbols.h
 	$(CC) -c lex.yy.c
 
-lex.yy.c: scanner.l
-	$(LEX) scanner.l
+lex.yy.c lex.yy.h: scanner.l
+	$(LEX) --header-file="lex.yy.h" scanner.l
 
 errorHandler.o: errorHandler.c errorHandler.h
 	$(CC) -c errorHandler.c
@@ -49,4 +49,4 @@ symbols.o: symbols.c symbols.h
 
 .PHONY: clean
 clean:
-	rm *.o lex.yy.c etapa2 y.tab.c y.tab.h y.output
+	rm *.o lex.yy.c etapa2 y.tab.c y.tab.h y.output lex.yy.h

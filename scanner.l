@@ -7,12 +7,12 @@
 // +--------------------------------------------------------------------------+
 //
 
-#include "scannerDefinitions.h"
+#include "scannerDefinitions.c"
 %}
 
 %x MULTILINECOMMENT
 
-%option warn nodefault yylineno noyywrap batch
+%option warn yylineno noyywrap batch nounput never-interactive noinput
 
 %%
 
