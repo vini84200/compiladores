@@ -16,12 +16,14 @@
 
 %%
 
-<MULTILINECOMMENT>"\\\\\\"      {BEGIN (INITIAL);}
+<MULTILINECOMMENT>\\\\\\        {BEGIN (INITIAL);}
 <MULTILINECOMMENT>.             {}
 <MULTILINECOMMENT>\n            {resetCollumn();}
-"\/\/\/".*              {BEGIN(MULTILINECOMMENT);}
+"\/\/\/"                      {BEGIN(MULTILINECOMMENT);}
 
-\/\/.*                  {}
+\/\/[^\n\/].*                  {resetCollumn();}
+\/\/                          {resetCollumn();}
+
 
 char        {return KW_CHAR;}
 int         {return KW_INT;}

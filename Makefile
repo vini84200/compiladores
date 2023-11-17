@@ -9,7 +9,7 @@
 
 LEX = lex
 YACC = yacc -d -v
-CC = gcc -Wall -std=c99
+CC = clang -Wall -std=c99
 
 all: etapa2
 
