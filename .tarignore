@@ -3,6 +3,8 @@
 .idea
 .gitignore
 *.o
-in
 *.tgz
 generateTarAndUpload.sh
+output
+*.out
+etapa*

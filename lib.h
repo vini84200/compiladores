@@ -8,6 +8,7 @@
 #ifndef LIB_HEADER
 #define LIB_HEADER
 
+#include "ast.h"
 #include "hash.h"
 #include "lex.yy.h"
 
@@ -17,6 +18,8 @@ int isRunning(void);
 void initSymbolTable(void);
 
 HashTable *getSymbolTable();
+AST *getAST();
+AST *setAST(AST *ast);
 
 void resetCollumn(void);
 void incrementCollumn(int increment);

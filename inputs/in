@@ -19,7 +19,7 @@ int a=0;
 
 int main();
 int incn (int x, int n );
-//float sdfhasd(char a, char b, int c, float d);
+float sdfhasd(char a, char b, int c, float d,);
 //float 1nvalid0 (int x, int n );
 
 ///

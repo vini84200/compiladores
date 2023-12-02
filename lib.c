@@ -36,7 +36,6 @@ void user_action() {
     incrementCollumn(yyleng);
 #ifdef DEBUG
 
-    printf("Recognized token: %s", yytext);
 #endif /* ifdef DEBUG
      */
 }

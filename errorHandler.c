@@ -15,7 +15,7 @@
 #include <string.h>
 
 int handle_wrong_arg_count(void) {
-    fprintf(stderr, "call: ./etapa2 input.txt \n");
+    fprintf(stderr, "call: ./etapa2 input.txt output\n");
     exit(WRONG_ARG_COUNT_ERR);
 }
 int handle_cannot_open_file(char *argv) {

@@ -7,6 +7,7 @@
 
 #include "errorHandler.h"
 #include "hash.h"
+#include "ast.h"
 #include "symbols.h"
 #include "y.tab.h"
 #include <stdio.h>
