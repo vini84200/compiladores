@@ -60,7 +60,7 @@
 %type <ast> program list_declare decl decl_var type value decl_array array_init_list decl_func list_param_def param_def param_def_tail list_implementation implementation func_implementation cmd cmd_block list_cmd cmd_attr cmd_attr_array cmd_print cmd_if cmd_if_tail cmd_while cmd_return expr list_expr expr_tail
 
 %%
-program: list_declare list_implementation       { $$ = createASTProgram($1, $2); printAST($$, 0);}
+program: list_declare list_implementation       { $$ = createASTProgram($1, $2); setAST($$); }
     ;
 
 list_declare: decl list_declare                 { $$ = createASTDeclList($1, $2); }

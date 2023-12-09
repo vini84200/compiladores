@@ -10,6 +10,7 @@
 #define SYMBOL_LIT_CHAR 3
 #define SYMBOL_LIT_STRING 4
 #define SYMBOL_IDENTIFIER 5
+#define LAST_SYMBOL 5
 
 typedef int SymbolType;
 

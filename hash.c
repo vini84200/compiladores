@@ -20,7 +20,7 @@ void hashPrint(HashTable *table) {
     printf("Table -- %d elements, %d collisions\n", table->elements,
            table->collisions);
     for (i = 0; i < table->size; i++) {
-        for (entry = table->entries[i]; entry != NULL; entry = entry->next) {
+        for (entry = table->entries[i]; entry != NULL; entry = entry->nextInHashBucket) {
             printf("symbolTable[%d] = %s (type %s)\n", i, entry->value, getSymbolName(entry->type));
         }
     }
@@ -35,7 +35,7 @@ HashEntry *hashInsert(HashTable *table, int type, char *value) {
     if (originalAtAddress != NULL) {
         // Check if the value is already in the table
         for (HashEntry *entry = originalAtAddress; entry != NULL;
-             entry = entry->next) {
+             entry = entry->nextInHashBucket) {
             if (strcmp(entry->value, value) == 0) {
                 // Value already in the table
                 return entry;
@@ -50,10 +50,20 @@ HashEntry *hashInsert(HashTable *table, int type, char *value) {
     newEntry = (HashEntry *) calloc(1, sizeof(HashEntry));
     newEntry->type = type;
     newEntry->value = calloc(strlen(value) + 1, sizeof(char));
-    newEntry->next = originalAtAddress;
+    newEntry->nextInHashBucket = originalAtAddress;
+    newEntry->nextOfTheSameType = NULL;
+    newEntry->identifier = NULL;
     strcpy(newEntry->value, value);
 
+
+    // Update the linked list
     table->entries[address] = newEntry;
+    if (table->heads[type] == NULL) {
+        table->heads[type] = newEntry;
+    } else {
+        table->tails[type]->nextOfTheSameType = newEntry;
+    }
+    table->tails[type] = newEntry;
     return newEntry;
 }
 
@@ -70,7 +80,7 @@ HashEntry *hashFind(HashTable *table, char *value) {
 
     if (table->entries[address] != NULL) {
         HashEntry *entry;
-        for (entry = table->entries[address]; entry != NULL; entry = entry->next) {
+        for (entry = table->entries[address]; entry != NULL; entry = entry->nextInHashBucket) {
             if (strcmp(entry->value, value) == 0) {
                 return entry;
             }
@@ -78,4 +88,26 @@ HashEntry *hashFind(HashTable *table, char *value) {
     }
 
     return NULL;
+}
+
+SymbolIterator *createSymbolIterator(HashTable *table, SymbolType type) {
+    SymbolIterator *iterator = (SymbolIterator *) calloc(1, sizeof(SymbolIterator));
+    iterator->table = table;
+    iterator->next = table->heads[type];
+    return iterator;
+}
+
+HashEntry *getNextSymbol(SymbolIterator *iterator) {
+    HashEntry *current = iterator->next;
+    if (current != NULL) {
+        iterator->next = current->nextOfTheSameType;
+    }
+    return current;
+}
+
+bool SymbolIteratorDone(SymbolIterator *iterator) {
+    return iterator->next == NULL;
+}
+void destroySymbolIterator(SymbolIterator *iterator) {
+    free(iterator);
 }

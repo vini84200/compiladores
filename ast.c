@@ -573,3 +573,41 @@ AST *createASTExprRead(AST *type) {
 AST *createASTCommandReturn(AST *expr) {
     return createAST(AST_COMMAND_RETURN, NULL, expr, NULL, NULL, NULL);
 }
+ASTListIterator *createASTListIterator(AST *list) {
+    ASTListIterator *iterator = (ASTListIterator *) calloc(1, sizeof(ASTListIterator));
+    iterator->next = list;
+    iterator->index = 0;
+    return iterator;
+}
+
+AST *getNextAST(ASTListIterator *iterator) {
+    AST *current = iterator->next;
+    if (current != NULL) {
+        iterator->next = current->children[1];
+        iterator->index++;
+    }
+    return current->children[0];
+}
+bool ASTIteratorDone(ASTListIterator *iterator) {
+    return iterator->next == NULL;
+}
+void destroyASTListIterator(ASTListIterator *iterator) {
+    free(iterator);
+}
+void destroyAST(AST *node) {
+
+    if (node->children[0] != NULL) {
+        destroyAST(node->children[0]);
+    }
+    if (node->children[1] != NULL) {
+        destroyAST(node->children[1]);
+    }
+    if (node->children[2] != NULL) {
+        destroyAST(node->children[2]);
+    }
+    if (node->children[3] != NULL) {
+        destroyAST(node->children[3]);
+    }
+    free(node);
+
+}

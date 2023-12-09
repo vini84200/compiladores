@@ -22,6 +22,16 @@ int handle_cannot_open_file(char *argv) {
     fprintf(stderr, "[ERROR] Cannot open file %s... \n", argv);
     exit(CANNOT_OPEN_FILE_ERR);
 }
+void handle_semantic_errors(SemanticErrorList *error_list) {
+    SemanticErrorIterator *iterator = newSemanticErrorIterator(error_list);
+    while (!semanticErrorIteratorDone(iterator)) {
+        SemanticError *error = semanticErrorIteratorNext(iterator);
+        fprintf(stderr, "[ERROR] %s at %d:%d\n", error->message, error->span->line, error->span->collumn);
+        // printLineErrWithPtr(error->span->line, error->span->collumn, error->span->, error->message);
+        // TODO: print the line where the error occurred with a pointer to the char
+    }
+    exit(SEMANTIC_ERROR_ERR);
+}
 int handleUnrecognizedToken(char token, int line) {
     fprintf(stderr, "[ERROR] Token '%c' not recognized at %d:%d\n", token, line, getCollumn());
     printLineErrWithPtr(line, getCollumn(), "Unrecognized token");
@@ -123,6 +133,10 @@ int printLineErrWithHighlight(const int line_number, const int ch, const int cou
         fprintf(stderr, "Line not found\n");
         return 1;
     }
+}
+void criticalError(const char *message) {
+    fprintf(stderr, "[ERROR] %s\n", message);
+    exit(UNKNOW_ERROR);
 }
 
 void handle_syntax_error() {

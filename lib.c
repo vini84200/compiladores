@@ -14,6 +14,7 @@ int lineNumber = 1;
 int running = 1;
 int end_collumn = 0;
 HashTable symbolTable;
+AST *ast = NULL;
 
 int isRunning() { return running; }
 
@@ -25,6 +26,14 @@ int getCollumn(void) {
 void initSymbolTable() { hashCreate(&symbolTable, 997); }
 
 HashTable *getSymbolTable() { return &symbolTable; }
+AST *getAST() {
+    return ast;
+}
+AST *setAST(AST *newAst) {
+    AST *oldAst = ast;
+    ast = newAst;
+    return oldAst;
+}
 void resetCollumn(void) {
     end_collumn = 0;
 }
@@ -34,6 +43,7 @@ void incrementCollumn(int increment) {
 }
 void user_action() {
     incrementCollumn(yyleng);
+
 #ifdef DEBUG
 
 #endif /* ifdef DEBUG

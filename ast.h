@@ -21,6 +21,7 @@ typedef struct ast_node {
 void open_output_file(char *filename);
 
 AST *createAST(int type, HashEntry *symbol, AST *child0, AST *child1, AST *child2, AST *child3);
+void destroyAST(AST *node);
 
 void printAST(AST *node, int level);
 
@@ -135,5 +136,14 @@ AST *createASTExprRead(AST *type);
 
 AST *createASTCommandReturn(AST *expr);
 
+typedef struct {
+    AST *next;
+    int index;
+} ASTListIterator;
+
+ASTListIterator *createASTListIterator(AST *list);
+AST *getNextAST(ASTListIterator *iterator);
+bool ASTIteratorDone(ASTListIterator *iterator);
+void destroyASTListIterator(ASTListIterator *iterator);
 
 #endif //AST_H

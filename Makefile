@@ -19,8 +19,13 @@ debug: all
 run: all
 	@(./etapa3 in)
 
-etapa3: lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o ast.o
-	$(CC) -o etapa3 lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o ast.o
+etapa3: lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o ast.o semantics.o span.o semanticError.o types.o
+	$(CC) -o etapa3 lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o ast.o semantics.o span.o semanticError.o types.o
+
+.PHONY: clean
+clean:
+	rm *.o lex.yy.c etapa3 y.tab.c y.tab.h y.output lex.yy.h
+
 main.o: main.c lib.h lex.yy.h y.tab.h errorHandler.h
 	$(CC) -c main.c
 hash.o: hash.c
@@ -49,7 +54,14 @@ symbols.o: symbols.c symbols.h
 ast.o: ast.c ast.h
 	$(CC) -c ast.c
 
+semantics.o: semantics.c semantics.h
+		$(CC) -c semantics.c
 
-.PHONY: clean
-clean:
-	rm *.o lex.yy.c etapa3 y.tab.c y.tab.h y.output lex.yy.h
+span.o: span.c span.h
+	$(CC) -c span.c
+
+semanticError.o: semanticError.c semanticError.h
+	$(CC) -c semanticError.c
+
+types.o: types.c types.h
+	$(CC) -c types.c

@@ -18,8 +18,12 @@ int isRunning(void);
 void initSymbolTable(void);
 
 HashTable *getSymbolTable();
+
+/// @brief Returns the current AST
 AST *getAST();
-AST *setAST(AST *ast);
+
+/// @brief Sets the AST and returns the old one
+AST *setAST(AST *newAst);
 
 void resetCollumn(void);
 void incrementCollumn(int increment);
