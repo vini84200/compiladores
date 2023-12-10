@@ -148,4 +148,6 @@ AST *getNextAST(ASTListIterator *iterator);
 bool ASTIteratorDone(ASTListIterator *iterator);
 void destroyASTListIterator(ASTListIterator *iterator);
 
+void astPrintDebug(AST *node, int level);
+
 #endif //AST_H

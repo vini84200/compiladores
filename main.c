@@ -31,6 +31,8 @@ int main(const int argc, char **argv) {
     yyparse();
     printf("Leitura concluída com sucesso!\n");
     // hashPrint(getSymbolTable());
+    astPrintDebug(getAST(), 0);
+
     printf("Iniciando análise semântica...\n");
     SemanticAnalyzerResult *result = analyzeSemantics(getAST());
     if (result->error_list->first != NULL) {

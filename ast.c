@@ -49,7 +49,7 @@ char *printASTType(int type) {
 
 void printIdent(int count, char ident) {
     for (int i = 0; i < count; i++) {
-        fprintf(output_file, "%c", ident);
+        printf("%c", ident);
     }
 }
 
@@ -441,139 +441,139 @@ void printAST(AST *node, int level) {
     }
 }
 AST *createASTProgram(AST *declaration_list, AST *code_list, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_PROGRAM, NULL, declaration_list, code_list, NULL, NULL);
+    return createAST(AST_PROGRAM, NULL, declaration_list, code_list, NULL, NULL, loc);
 }
 AST *createASTDeclList(AST *declaration, AST *declaration_list, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_DECLARATION_LIST, NULL, declaration, declaration_list, NULL, NULL);
+    return createAST(AST_DECLARATION_LIST, NULL, declaration, declaration_list, NULL, NULL, loc);
 }
 AST *createASTVarDecl(AST *type, HashEntry *identifier, AST *value, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_VAR_DECLARATION, identifier, type, value, NULL, NULL);
+    return createAST(AST_VAR_DECLARATION, identifier, type, value, NULL, NULL, loc);
 }
 AST *createASTType(int type, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_TYPE_BASE + type, NULL, NULL, NULL, NULL, NULL);
+    return createAST(AST_TYPE_BASE + type, NULL, NULL, NULL, NULL, NULL, loc);
 }
 AST *createASTValue(HashEntry *value, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_VALUE, value, NULL, NULL, NULL, NULL);
+    return createAST(AST_VALUE, value, NULL, NULL, NULL, NULL, loc);
 }
 AST *createASTArrayDecl(AST *type, HashEntry *identifier, HashEntry *size, AST *value, struct YYLTYPE loc) {
     AST *array_size = createASTValue(size, loc);
-    return createASTnoSpan(AST_ARRAY_DECLARATION, identifier, type, array_size, value, NULL);
+    return createAST(AST_ARRAY_DECLARATION, identifier, type, array_size, value, NULL, loc);
 }
 AST *createASTArrayValues(AST *value, AST *values, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_ARRAY_VALUES, NULL, value, values, NULL, NULL);
+    return createAST(AST_ARRAY_VALUES, NULL, value, values, NULL, NULL, loc);
 }
 AST *createASTFuncDecl(AST *type, HashEntry *identifier, AST *param_list, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_FUNC_DECLARATION, identifier, type, param_list, NULL, NULL);
+    return createAST(AST_FUNC_DECLARATION, identifier, type, param_list, NULL, NULL, loc);
 }
 AST *createASTParamList(AST *param, AST *param_list, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_PARAM_LIST, NULL, param, param_list, NULL, NULL);
+    return createAST(AST_PARAM_LIST, NULL, param, param_list, NULL, NULL, loc);
 }
 AST *createASTParam(AST *type, HashEntry *identifier, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_PARAM, identifier, type, NULL, NULL, NULL);
+    return createAST(AST_PARAM, identifier, type, NULL, NULL, NULL, loc);
 }
 AST *createASTCodeList(AST *code, AST *code_list, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_CODE_LIST, NULL, code, code_list, NULL, NULL);
+    return createAST(AST_CODE_LIST, NULL, code, code_list, NULL, NULL, loc);
 }
 
 AST *createASTImplFunc(HashEntry *identifier, AST *command, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_IMPL_FUNC, identifier, command, NULL, NULL, NULL);
+    return createAST(AST_IMPL_FUNC, identifier, command, NULL, NULL, NULL, loc);
 }
 AST *createASTEmptyCommand(struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EMPTY_COMMAND, NULL, NULL, NULL, NULL, NULL);
+    return createAST(AST_EMPTY_COMMAND, NULL, NULL, NULL, NULL, NULL, loc);
 }
 AST *createASTCommandBlock(AST *command_list, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_COMMAND_BLOCK, NULL, command_list, NULL, NULL, NULL);
+    return createAST(AST_COMMAND_BLOCK, NULL, command_list, NULL, NULL, NULL, loc);
 }
 AST *createASTCommandList(AST *command, AST *command_list, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_COMMAND_LIST, NULL, command, command_list, NULL, NULL);
+    return createAST(AST_COMMAND_LIST, NULL, command, command_list, NULL, NULL, loc);
 }
 AST *createASTCommandAssign(HashEntry *identifier, AST *expr, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_COMMAND_ASSIGN, identifier, expr, NULL, NULL, NULL);
+    return createAST(AST_COMMAND_ASSIGN, identifier, expr, NULL, NULL, NULL, loc);
 }
 AST *createASTCommandAssignArray(HashEntry *identifier, AST *expr_index, AST *expr_value, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_COMMAND_ASSIGN_ARRAY, identifier, expr_index, expr_value, NULL, NULL);
+    return createAST(AST_COMMAND_ASSIGN_ARRAY, identifier, expr_index, expr_value, NULL, NULL, loc);
 }
 
 AST *createASTCommandPrintExpr(AST *expr, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_COMMAND_PRINT_EXPR, NULL, expr, NULL, NULL, NULL);
+    return createAST(AST_COMMAND_PRINT_EXPR, NULL, expr, NULL, NULL, NULL, loc);
 }
 AST *createASTCommandPrintString(HashEntry *string, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_COMMAND_PRINT_STRING, string, NULL, NULL, NULL, NULL);
+    return createAST(AST_COMMAND_PRINT_STRING, string, NULL, NULL, NULL, NULL, loc);
 }
 AST *createASTCommandIf(AST *expr, AST *command_if, AST *command_else, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_COMMAND_IF, NULL, expr, command_if, command_else, NULL);
+    return createAST(AST_COMMAND_IF, NULL, expr, command_if, command_else, NULL, loc);
 }
 AST *createASTCommandWhile(AST *expr, AST *command, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_COMMAND_WHILE, NULL, expr, command, NULL, NULL);
+    return createAST(AST_COMMAND_WHILE, NULL, expr, command, NULL, NULL, loc);
 }
 AST *createASTExprVar(HashEntry *identifier, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_IDENTIFIER, identifier, NULL, NULL, NULL, NULL);
+    return createAST(AST_EXPR_IDENTIFIER, identifier, NULL, NULL, NULL, NULL, loc);
 }
 AST *createASTExprArrayGet(HashEntry *identifier, AST *expr_index, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_ARRAY_GET, identifier, expr_index, NULL, NULL, NULL);
+    return createAST(AST_EXPR_ARRAY_GET, identifier, expr_index, NULL, NULL, NULL, loc);
 }
 AST *createASTExprFuncCall(HashEntry *identifier, AST *expr_list, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_FUNC_CALL, identifier, expr_list, NULL, NULL, NULL);
+    return createAST(AST_EXPR_FUNC_CALL, identifier, expr_list, NULL, NULL, NULL, loc);
 }
 AST *createASTExprList(AST *expr, AST *expr_list, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_LIST, NULL, expr, expr_list, NULL, NULL);
+    return createAST(AST_EXPR_LIST, NULL, expr, expr_list, NULL, NULL, loc);
 }
 AST *createASTExprLitInt(HashEntry *value, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_LIT_INT, value, NULL, NULL, NULL, NULL);
+    return createAST(AST_EXPR_LIT_INT, value, NULL, NULL, NULL, NULL, loc);
 }
 AST *createASTExprLitFloat(HashEntry *value, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_LIT_FLOAT, value, NULL, NULL, NULL, NULL);
+    return createAST(AST_EXPR_LIT_FLOAT, value, NULL, NULL, NULL, NULL, loc);
 }
 AST *createASTExprLitChar(HashEntry *value, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_LIT_CHAR, value, NULL, NULL, NULL, NULL);
+    return createAST(AST_EXPR_LIT_CHAR, value, NULL, NULL, NULL, NULL, loc);
 }
 AST *createASTExprAdd(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_ADD, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_ADD, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprSub(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_SUB, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_SUB, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprMul(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_MUL, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_MUL, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprDiv(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_DIV, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_DIV, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprLess(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_LESS, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_LESS, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprGreater(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_GREATER, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_GREATER, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprLE(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_LE, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_LE, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprGE(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_GE, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_GE, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprEQ(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_EQ, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_EQ, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprNE(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_NE, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_NE, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprAnd(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_AND, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_AND, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprOr(AST *expr0, AST *expr1, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_OR, NULL, expr0, expr1, NULL, NULL);
+    return createAST(AST_EXPR_OR, NULL, expr0, expr1, NULL, NULL, loc);
 }
 AST *createASTExprNot(AST *expr, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_NOT, NULL, expr, NULL, NULL, NULL);
+    return createAST(AST_EXPR_NOT, NULL, expr, NULL, NULL, NULL, loc);
 }
 AST *createASTExprMinus(AST *expr, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_MINUS, NULL, expr, NULL, NULL, NULL);
+    return createAST(AST_EXPR_MINUS, NULL, expr, NULL, NULL, NULL, loc);
 }
 AST *createASTExprRead(AST *type, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_EXPR_READ, NULL, type, NULL, NULL, NULL);
+    return createAST(AST_EXPR_READ, NULL, type, NULL, NULL, NULL, loc);
 }
 AST *createASTCommandReturn(AST *expr, struct YYLTYPE loc) {
-    return createASTnoSpan(AST_COMMAND_RETURN, NULL, expr, NULL, NULL, NULL);
+    return createAST(AST_COMMAND_RETURN, NULL, expr, NULL, NULL, NULL, loc);
 }
 ASTListIterator *createASTListIterator(AST *list) {
     ASTListIterator *iterator = (ASTListIterator *) calloc(1, sizeof(ASTListIterator));
@@ -625,4 +625,85 @@ AST *createAST(int type, HashEntry *symbol, AST *child0, AST *child1, AST *child
     node->children[3] = child3;
     node->span = spanFromLocation(&location);
     return node;
+}
+
+void astPrintNodeTypes(AST *node) {
+#define PRINT_TYPE(type) case type: printf(#type); break;
+    switch (node->type) {
+        PRINT_TYPE(AST_PROGRAM)
+        PRINT_TYPE(AST_DECLARATION_LIST)
+        PRINT_TYPE(AST_VAR_DECLARATION)
+        PRINT_TYPE(AST_FUNC_DECLARATION)
+        PRINT_TYPE(AST_ARRAY_DECLARATION)
+        PRINT_TYPE(AST_ARRAY_VALUES)
+        PRINT_TYPE(AST_PARAM_LIST)
+        PRINT_TYPE(AST_PARAM)
+        PRINT_TYPE(AST_TYPE_INT)
+        PRINT_TYPE(AST_TYPE_FLOAT)
+        PRINT_TYPE(AST_TYPE_CHAR)
+        PRINT_TYPE(AST_VALUE)
+        PRINT_TYPE(AST_CODE_LIST)
+        PRINT_TYPE(AST_IMPL_FUNC)
+        PRINT_TYPE(AST_EMPTY_COMMAND)
+        PRINT_TYPE(AST_COMMAND_BLOCK)
+        PRINT_TYPE(AST_COMMAND_LIST)
+        PRINT_TYPE(AST_COMMAND_ASSIGN)
+        PRINT_TYPE(AST_COMMAND_ASSIGN_ARRAY)
+        PRINT_TYPE(AST_COMMAND_PRINT_EXPR)
+        PRINT_TYPE(AST_COMMAND_PRINT_STRING)
+        PRINT_TYPE(AST_COMMAND_IF)
+        PRINT_TYPE(AST_COMMAND_WHILE)
+        PRINT_TYPE(AST_EXPR_IDENTIFIER)
+        PRINT_TYPE(AST_EXPR_ARRAY_GET)
+        PRINT_TYPE(AST_EXPR_FUNC_CALL)
+        PRINT_TYPE(AST_EXPR_LIST)
+        PRINT_TYPE(AST_EXPR_LIT_INT)
+        PRINT_TYPE(AST_EXPR_LIT_FLOAT)
+        PRINT_TYPE(AST_EXPR_LIT_CHAR)
+        PRINT_TYPE(AST_EXPR_ADD)
+        PRINT_TYPE(AST_EXPR_SUB)
+        PRINT_TYPE(AST_EXPR_MUL)
+        PRINT_TYPE(AST_EXPR_DIV)
+        PRINT_TYPE(AST_EXPR_LESS)
+        PRINT_TYPE(AST_EXPR_GREATER)
+        PRINT_TYPE(AST_EXPR_LE)
+        PRINT_TYPE(AST_EXPR_GE)
+        PRINT_TYPE(AST_EXPR_EQ)
+        PRINT_TYPE(AST_EXPR_NE)
+        PRINT_TYPE(AST_EXPR_AND)
+        PRINT_TYPE(AST_EXPR_OR)
+        PRINT_TYPE(AST_EXPR_NOT)
+        PRINT_TYPE(AST_EXPR_MINUS)
+        PRINT_TYPE(AST_EXPR_READ)
+        PRINT_TYPE(AST_COMMAND_RETURN)
+    }
+}
+
+void astPrintDebug(AST *node, int level) {
+    if (node == NULL) {
+        return;
+    }
+    printIdent(level * 2, ' ');
+    printf("(");
+    astPrintNodeTypes(node);
+
+    if (node->symbol != NULL) {
+        printIdent(level * 2, ' ');
+        printf(" sym: '%s'", node->symbol->value);
+    }
+
+    printf(" (%d, %d) - (%d, %d) \n", node->span->line, node->span->collumn, node->span->end_line, node->span->end_collumn);
+    int next_level;
+    if (node->type == AST_DECLARATION_LIST || node->type == AST_CODE_LIST || node->type == AST_PARAM_LIST ||
+        node->type == AST_COMMAND_LIST || node->type == AST_EXPR_LIST) {
+        next_level = level;
+    } else {
+        next_level = level + 1;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        astPrintDebug(node->children[i], next_level);
+    }
+    printIdent(level * 2, ' ');
+    printf(")\n");
 }
