@@ -7,13 +7,13 @@
 
 #include "ast.h"
 #include "errorHandler.h"
-#include "lex.yy.h"
 #include "lib.h"
 #include "semantics.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 // lex.yy.h
+extern FILE *yyin;
 int yyparse();
 
 
@@ -31,7 +31,7 @@ int main(const int argc, char **argv) {
     yyparse();
     printf("Leitura concluída com sucesso!\n");
     // hashPrint(getSymbolTable());
-    astPrintDebug(getAST(), 0);
+//    astPrintDebug(getAST(), 0);
 
     printf("Iniciando análise semântica...\n");
     SemanticAnalyzerResult *result = analyzeSemantics(getAST());

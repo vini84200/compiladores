@@ -10,7 +10,6 @@
 
 #include "ast.h"
 #include "hash.h"
-#include "lex.yy.h"
 
 int getLineNumber(void);
 int getCollumn(void);

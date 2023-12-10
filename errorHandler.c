@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern int yyleng;
 int handle_wrong_arg_count(void) {
     fprintf(stderr, "call: ./etapa2 input.txt output\n");
     exit(WRONG_ARG_COUNT_ERR);
@@ -22,13 +23,22 @@ int handle_cannot_open_file(char *argv) {
     fprintf(stderr, "[ERROR] Cannot open file %s... \n", argv);
     exit(CANNOT_OPEN_FILE_ERR);
 }
+
+void semantic_error_print_spans(SemanticError *error) {
+    // Print the line where the error occurred
+    // It could be just one span or two spans
+    printLineErrWithHighlight(error->span->line, error->span->collumn, error->span->end_collumn - error->span->collumn + 1, error->span_text);
+    if (error->secondary_span != NULL) {
+        printLineErrWithHighlight(error->secondary_span->line, error->secondary_span->collumn, error->secondary_span->end_collumn - error->secondary_span->collumn + 1, error->secondary_span_text);
+    }
+}
+
 void handle_semantic_errors(SemanticErrorList *error_list) {
     SemanticErrorIterator *iterator = newSemanticErrorIterator(error_list);
     while (!semanticErrorIteratorDone(iterator)) {
         SemanticError *error = semanticErrorIteratorNext(iterator);
         fprintf(stderr, "[ERROR] %s at %d:%d\n", error->message, error->span->line, error->span->collumn);
-        // printLineErrWithPtr(error->span->line, error->span->collumn, error->span->, error->message);
-        // TODO: print the line where the error occurred with a pointer to the char
+        semantic_error_print_spans(error);
     }
     exit(SEMANTIC_ERROR_ERR);
 }

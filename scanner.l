@@ -10,6 +10,7 @@
 #include "scannerDefinitions.c"
 %}
 
+
 %x MULTILINECOMMENT
 
 %option warn yylineno noyywrap batch nounput never-interactive noinput
@@ -44,7 +45,6 @@ return      {return KW_RETURN;}
 
 
 [-,;()\[\]{}=+*\/%<>&|~] {return yytext[0];}
-
 [0-9]+          {
                     yylval.symbol = hashInsert(getSymbolTable(), SYMBOL_LIT_INT, yytext);
                     return LIT_INT;

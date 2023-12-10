@@ -1,12 +1,18 @@
-int vini = 32;
-int d[10];
-int g(int a, int b);
-int c(int a, int b, int e);
+int a =1;
+float z[2];
+
+int c (char x, char e);
+int d (char x, char o);
 
 code c {
-    print vini;
+    while (~(3==3)) {
+        a = 2;
+    };
+    a = c(1,(2+3)==23,2);
+
+    return 23;
 }
 
-code g {
+code d {
 
 }

@@ -41,13 +41,17 @@ typedef struct SemanticError_t {
     SemanticErrorType error_code;
     char *message;
     Span *span;
+    char *span_text;
     Span *secondary_span;
+    char *secondary_span_text;
+
 
 
     struct SemanticError_t *next;
 } SemanticError;
 
 SemanticError *newSemanticError(SemanticErrorType error_code, char *message, Span *span, Span *secondary_span);
+SemanticError *newSemanticErrorWithMessages(SemanticErrorType error_code, char *message, Span *span, Span *secondary_span, char *span_text, char *secondary_span_text);
 SemanticError *newUndefIdentifierSemanticError(char *identifier, Span *span);
 SemanticError *newRedefIdentifierSemanticError(char *identifier, Span *span, Span *original_declaration_span);
 SemanticError *newGlobalParamConflictSemanticError(char *identifier, Span *span, Span *original_declaration_span);
@@ -70,7 +74,7 @@ SemanticError *newWrongOperandTypeSemanticErrorUnary(char *identifier, char *exp
 SemanticError *newAssignTypeMismatchSemanticError(char *identifier, TypeBase expected, TypeBase got, Span *span);
 SemanticError *newIndexNotIntSemanticError(char *identifier, TypeBase got, Span *span);
 SemanticError *newReturnWrongTypeSemanticError(TypeBase expected, TypeBase got, Span *span);
-SemanticError *newWrongArgCountSemanticError(char *func_identifier,int expected, int got, Span *span);
+SemanticError *newWrongArgCountSemanticError(char *func_identifier,int expected, int got, Span *span, Span *original_declaration_span);
 SemanticError *newWrongArgTypeSemanticError(char *func_identifier, char *arg_identifier, TypeBase expected, TypeBase got, Span *span);
 
 typedef struct SemanticErrorList_t {

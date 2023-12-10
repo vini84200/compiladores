@@ -13,7 +13,9 @@ SemanticError *newSemanticError(SemanticErrorType error_code, char *message, Spa
     semantic_error->error_code = error_code;
     semantic_error->message = message;
     semantic_error->span = span;
+    semantic_error->span_text = "";
     semantic_error->secondary_span = secondary_span;
+    semantic_error->secondary_span_text = "";
     semantic_error->next = NULL;
     return semantic_error;
 }
@@ -22,17 +24,17 @@ char *getTypeBaseName(TypeBase type);
 SemanticError *newUndefIdentifierSemanticError(char *identifier, Span *span) {
     char *message;
     asprintf(&message, "Undefined identifier %s", identifier);
-    return newSemanticError(SEMANTIC_ERROR_UNDEF_IDENTIFIER, message, span, NULL);
+    return newSemanticErrorWithMessages(SEMANTIC_ERROR_UNDEF_IDENTIFIER, message, span, NULL, "Undefined identifier", "");
 }
 SemanticError *newRedefIdentifierSemanticError(char *identifier, Span *span, Span *original_declaration_span) {
     char *message;
     asprintf(&message, "Redefinition of identifier %s", identifier);
-    return newSemanticError(SEMANTIC_ERROR_REDEF_IDENTIFIER, message, span, original_declaration_span);
+    return newSemanticErrorWithMessages(SEMANTIC_ERROR_REDEF_IDENTIFIER, message, span, original_declaration_span, "Redefinition of identifier", "Original declaration");
 }
 SemanticError *newGlobalParamConflictSemanticError(char *identifier, Span *span, Span *original_declaration_span) {
     char *message;
     asprintf(&message, "Global variable %s conflicts with parameter name", identifier);
-    return newSemanticError(SEMANTIC_ERROR_GLOBAL_PARAM_CONFLICT, message, span, original_declaration_span);
+    return newSemanticErrorWithMessages(SEMANTIC_ERROR_GLOBAL_PARAM_CONFLICT, message, span, original_declaration_span, "Parameter to global conflict", "Original declaration");
 }
 SemanticErrorList *newSemanticErrorList() {
     SemanticErrorList *list = (SemanticErrorList *) malloc(sizeof(SemanticErrorList));
@@ -164,16 +166,27 @@ SemanticError *newIndexNotIntSemanticError(char *identifier, TypeBase got, Span 
     asprintf(&message, "Type Mismatch: Cannot index %s with %s, should be int", identifier, getTypeBaseName(got));
     return newSemanticError(SEMANTIC_INDEX_NOT_INT, message, span, NULL);
 }
-SemanticError *newWrongArgCountSemanticError(char *func_identifier, int expected, int got, Span *span) {
+SemanticError *newWrongArgCountSemanticError(char *func_identifier, int expected, int got, Span *span, Span *secondary_span) {
     char *message;
     asprintf(&message, "Wrong number of arguments for function %s, expected %d, got %d", func_identifier, expected,
              got);
-    return newSemanticError(SEMANTIC_ERROR_WRONG_ARG_COUNT, message, span, NULL);
+    return newSemanticErrorWithMessages(SEMANTIC_ERROR_WRONG_ARG_COUNT, message, span, secondary_span, "Wrong number of arguments", "Function declaration");
 }
 SemanticError *newWrongArgTypeSemanticError(char *func_identifier, char *arg_identifier, TypeBase expected, TypeBase got, Span *span) {
     char *message;
     asprintf(&message, "Wrong type for argument %s of function %s, expected %s, got %s", arg_identifier, func_identifier, getTypeBaseName(expected), getTypeBaseName(got));
     return newSemanticError(SEMANTIC_ERROR_WRONG_ARG_TYPE, message, span, NULL);
+}
+SemanticError *newSemanticErrorWithMessages(SemanticErrorType error_code, char *message, Span *span, Span *secondary_span, char *span_text, char *secondary_span_text) {
+    SemanticError *semantic_error = (SemanticError *) malloc(sizeof(SemanticError));
+    semantic_error->error_code = error_code;
+    semantic_error->message = message;
+    semantic_error->span = span;
+    semantic_error->span_text = span_text;
+    semantic_error->secondary_span = secondary_span;
+    semantic_error->secondary_span_text = secondary_span_text;
+    semantic_error->next = NULL;
+    return semantic_error;
 }
 
 char *getTypeBaseName(TypeBase type) {

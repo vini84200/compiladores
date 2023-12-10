@@ -33,14 +33,16 @@ void analyzeDeclarations(AST *declList) {
         if (decl->type == AST_VAR_DECLARATION) {
             // VAR_DECLARATION( sym=id, $0=type, $1=value )
             Type *type = newScalarType(getTypeBaseFromASTType(decl->children[0]));
-            semanticTry((setGlobalBound(decl->symbol, type, emptySpan())));
+            semanticTry((setGlobalBound(decl->symbol, type, decl->span)));
+            // TODO: Check if the value is of the same type as the variable
             continue;
         }
         if (decl->type == AST_ARRAY_DECLARATION) {
             // ARRAY_DECLARATION( sym=id, $0=type, $1=size, $2=list_of_values )
             const int size = (int) strtol(decl->children[1]->symbol->value, NULL, 10);
             Type *type = newArrayType(getTypeBaseFromASTType(decl->children[0]), size);
-            semanticTry(setGlobalBound(decl->symbol, type, emptySpan()));
+            semanticTry(setGlobalBound(decl->symbol, type, decl->span));
+            // TODO: Check if the values are of the same type as the variable
             continue;
         }
         if (decl->type == AST_FUNC_DECLARATION) {
@@ -55,11 +57,11 @@ void analyzeDeclarations(AST *declList) {
                 Type *type = newScalarType(param_type);
                 paramTypeListAppend(param_list, newParamType(type, param->symbol));
                 // Bind the parameter
-                semanticTry(setParamBound(param->symbol, type, decl->symbol));
+                semanticTry(setParamBound(param->symbol, type, decl->symbol, param->span));
             }
             destroyASTListIterator(param_iterator);
             Type *type = newFunctionType(returnType, param_list);
-            semanticTry(setGlobalBound(decl->symbol, type, emptySpan()));
+            semanticTry(setGlobalBound(decl->symbol, type, decl->span));
             continue;
         }
     }
@@ -73,6 +75,8 @@ void analyzeDeclarations(AST *declList) {
             continue;
         }
         if (entry->identifier == NULL) {
+            //TODO: Move this to the implementation checking phase so we can give a better error message
+            // We can't know where the identifier was used, so we can't give a good error message
             semanticTry(newUndefIdentifierSemanticError(entry->value, emptySpan()));
         }
     }
@@ -102,17 +106,17 @@ void analyzeImplementations(struct ast_node *implList) {
             // FUNC_IMPL( sym=id, $0=cmd )
             if (impl->symbol->identifier == NULL) {
                 // The function is not defined
-                semanticThrow(newFunctionNotDeclaredSemanticError(impl->symbol->value, emptySpan()));
+                semanticThrow(newFunctionNotDeclaredSemanticError(impl->symbol->value, impl->span));
                 continue;
             } else if (impl->symbol->identifier->type->plural != TYPE_NATURE_FUNCTION) {
                 // The symbol is not a function
-                semanticThrow(newIsNotAFunctionSemanticError(impl->symbol->value, emptySpan()));
+                semanticThrow(newIsNotAFunctionSemanticError(impl->symbol->value, impl->span));
                 continue;
             }
             // The symbol is a function, and it's defined
             // Can only be implemented once
             if (impl->symbol->implemented) {
-                semanticThrow(newFunctionReimplementationSemanticError(impl->symbol->value, emptySpan(),
+                semanticThrow(newFunctionReimplementationSemanticError(impl->symbol->value, impl->span,
                                                                        impl->symbol->identifier->declaration_span));
                 continue;
             }
@@ -139,7 +143,7 @@ void analyzeImplementations(struct ast_node *implList) {
             if (entry->identifier->type->plural == TYPE_NATURE_FUNCTION) {
                 if (!entry->implemented) {
                     // The function is not implemented, this is an error
-                    semanticThrow(newFunctionNotImplementedSemanticError(entry->value, emptySpan()));
+                    semanticThrow(newFunctionNotImplementedSemanticError(entry->value, entry->identifier->declaration_span));
                 }
             }
         }
@@ -219,41 +223,42 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
             if (paramListContains(pList, cmd->symbol)) {
                 // The parameter is defined in the function
                 // This is an error as we can't assign to a parameter
-                semanticThrow(newAssignToParamSemanticError(cmd->symbol->value, emptySpan()));
+                semanticThrow(newAssignToParamSemanticError(cmd->symbol->value, cmd->span));
                 return;
             }
             // The parameter is not defined in the function
             // This is an error
-            semanticThrow(newUndefIdentifierSemanticError(cmd->symbol->value, emptySpan()));
+            semanticThrow(newUndefIdentifierSemanticError(cmd->symbol->value, cmd->span));
             return;
         }
         if (cmd->symbol->identifier->bound->bound_type == BOUND_TYPE_GLOBAL) {
             // The identifier is a global variable
-            TypeBase type = cmd->symbol->identifier->type->base;
-            TypeBase exprType = getExpressionType(cmd->children[0], pList);
-            if (!isCompatible(type, exprType) && exprType != TYPE_BASE_ERROR) {
-                // The expression is not of the same type as the variable
-                // This is an error
-                semanticThrow(newAssignTypeMismatchSemanticError(cmd->symbol->value,
-                                                                 type,
-                                                                 exprType,
-                                                                 emptySpan()));
-                return;
-            }
 
             switch (cmd->symbol->identifier->type->plural) {
                 case TYPE_NATURE_ARRAY:
                     // The identifier is not a scalar
                     // This is an error
-                    semanticThrow(newAssignToArraySemanticError(cmd->symbol->value, emptySpan()));
+                    semanticThrow(newAssignToArraySemanticError(cmd->symbol->value, cmd->span));
                     return;
                 case TYPE_NATURE_FUNCTION:
                     // The identifier is not a scalar
                     // This is an error
-                    semanticThrow(newAssignToFunctionSemanticError(cmd->symbol->value, emptySpan()));
+                    semanticThrow(newAssignToFunctionSemanticError(cmd->symbol->value, cmd->span));
                     return;
-                case TYPE_NATURE_SCALAR:
+                case TYPE_NATURE_SCALAR: {
+                    TypeBase type = cmd->symbol->identifier->type->base;
+                    TypeBase exprType = getExpressionType(cmd->children[0], pList);
+                    if (!isCompatible(type, exprType) && exprType != TYPE_BASE_ERROR) {
+                        // The expression is not of the same type as the variable
+                        // This is an error
+                        semanticThrow(newAssignTypeMismatchSemanticError(cmd->symbol->value,
+                                                                         type,
+                                                                         exprType,
+                                                                         cmd->children[0]->span));
+                        return;
+                    }
                     return;
+                }
                 default:
                     criticalError("Invalid type nature");
             }
@@ -264,7 +269,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
         // ASSIGN_ARRAY( sym=id, $0=expr for index, $1=expr for value )
         if (cmd->symbol->identifier == NULL) {
             // The identifier is not defined
-            semanticThrow(newUndefIdentifierSemanticError(cmd->symbol->value, emptySpan()));
+            semanticThrow(newUndefIdentifierSemanticError(cmd->symbol->value, cmd->span));
             return;
         }
         if (cmd->symbol->identifier->bound->bound_type == BOUND_TYPE_PARAM) {
@@ -273,12 +278,12 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
             if (paramListContains(pList, cmd->symbol)) {
                 // The parameter is defined in the function
                 // This is an error as we can't assign to a parameter
-                semanticThrow(newAssignToParamSemanticError(cmd->symbol->value, emptySpan()));
+                semanticThrow(newAssignToParamSemanticError(cmd->symbol->value, cmd->span));
                 return;
             }
             // The parameter is not defined in the function
             // This is an error
-            semanticThrow(newUndefIdentifierSemanticError(cmd->symbol->value, emptySpan()));
+            semanticThrow(newUndefIdentifierSemanticError(cmd->symbol->value, cmd->span));
             return;
         }
         if (cmd->symbol->identifier->bound->bound_type == BOUND_TYPE_GLOBAL) {
@@ -287,7 +292,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
             if (!isCompatible(TYPE_BASE_INT, indexType) && indexType != TYPE_BASE_ERROR) {
                 // The index is not an integer expression
                 // This is an error
-                semanticThrow(newIndexScalarSemanticError(cmd->symbol->value, emptySpan()));
+                semanticThrow(newIndexNotIntSemanticError(cmd->symbol->value, indexType, cmd->children[0]->span));
                 return;
             }
             TypeBase exprType = getExpressionType(cmd->children[1], pList);
@@ -298,7 +303,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
                 semanticThrow(newAssignTypeMismatchSemanticError(cmd->symbol->value,
                                                                  cmd->symbol->identifier->type->base,
                                                                  getExpressionType(cmd->children[1], pList),
-                                                                 emptySpan()));
+                                                                cmd->children[1]->span));
                 return;
             }
             if (cmd->symbol->identifier->type->plural == TYPE_NATURE_ARRAY) {
@@ -307,12 +312,12 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
             } else if (cmd->symbol->identifier->type->plural == TYPE_NATURE_FUNCTION) {
                 // The identifier is not an array
                 // This is an error
-                semanticThrow(newIndexFunctionSemanticError(cmd->symbol->value, emptySpan()));
+                semanticThrow(newIndexFunctionSemanticError(cmd->symbol->value, cmd->span));
                 return;
             } else if (cmd->symbol->identifier->type->plural == TYPE_NATURE_SCALAR) {
                 // The identifier is not an array
                 // This is an error
-                semanticThrow(newIndexScalarSemanticError(cmd->symbol->value, emptySpan()));
+                semanticThrow(newIndexScalarSemanticError(cmd->symbol->value, cmd->span));
                 return;
             }
         }
@@ -334,7 +339,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
         if (!isCompatible(TYPE_BASE_BOOL, exprType) && exprType != TYPE_BASE_ERROR) {
             // The expression is not a boolean expression
             // This is an error
-            semanticThrow(newWrongOperandTypeSemanticErrorUnary("if", "boolean", exprType, emptySpan()));
+            semanticThrow(newWrongOperandTypeSemanticErrorUnary("if", "boolean", exprType, cmd->children[0]->span));
             return;
         }
         analyzeCommand(cmd->children[1], pList, funcType);
@@ -346,7 +351,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
         if (!isCompatible(TYPE_BASE_BOOL, exprType) && exprType != TYPE_BASE_ERROR) {
             // The expression is not a boolean expression
             // This is an error
-            semanticThrow(newWrongOperandTypeSemanticErrorUnary("while", "boolean", exprType, emptySpan()));
+            semanticThrow(newWrongOperandTypeSemanticErrorUnary("while", "boolean", exprType, cmd->children[0]->span));
             return;
         }
         analyzeCommand(cmd->children[1], pList, funcType);
@@ -358,7 +363,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
         if (!isCompatible(expectedType, exprType) && exprType != TYPE_BASE_ERROR) {
             // The expression is not of the same type as the function
             // This is an error
-            semanticThrow(newReturnWrongTypeSemanticError(expectedType, exprType, emptySpan()));
+            semanticThrow(newReturnWrongTypeSemanticError(expectedType, exprType, cmd->children[0]->span));
             return;
         }
     }
@@ -386,11 +391,11 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                             break;
                         case TYPE_NATURE_ARRAY:
                             // This is an error
-                            semanticThrow(newReadFromArraySemanticError(expr->symbol->value, emptySpan()));
+                            semanticThrow(newReadFromArraySemanticError(expr->symbol->value, expr->span));
                             return TYPE_BASE_ERROR;
                         case TYPE_NATURE_FUNCTION:
                             // This is an error
-                            semanticThrow(newReadFromFunctionSemanticError(expr->symbol->value, emptySpan()));
+                            semanticThrow(newReadFromFunctionSemanticError(expr->symbol->value, expr->span));
                             return TYPE_BASE_ERROR;
                     }
                     return expr->symbol->identifier->type->base;
@@ -405,7 +410,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                     }
                     // The parameter is not defined in the function
                     // This is an error
-                    semanticThrow(newUndefIdentifierSemanticError(expr->symbol->value, emptySpan()));
+                    semanticThrow(newUndefIdentifierSemanticError(expr->symbol->value, expr->span));
                     return TYPE_BASE_ERROR;
             }
             break;
@@ -422,7 +427,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                     switch (expr->symbol->identifier->type->plural) {
                         case TYPE_NATURE_SCALAR:
                             // This is an error
-                            semanticThrow(newIndexScalarSemanticError(expr->symbol->value, emptySpan()));
+                            semanticThrow(newIndexScalarSemanticError(expr->symbol->value, expr->span));
                             return TYPE_BASE_ERROR;
                         case TYPE_NATURE_ARRAY: {
                             // This is ok
@@ -430,14 +435,14 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                             if (indexType != TYPE_BASE_INT && indexType != TYPE_BASE_ERROR) {
                                 // The index is not an integer expression
                                 // This is an error
-                                semanticThrow(newIndexNotIntSemanticError(expr->symbol->value, indexType, emptySpan()));
+                                semanticThrow(newIndexNotIntSemanticError(expr->symbol->value, indexType, expr->children[0]->span));
                                 return TYPE_BASE_ERROR;
                             }
                             return expr->symbol->identifier->type->base;
                         }
                         case TYPE_NATURE_FUNCTION:
                             // This is an error
-                            semanticThrow(newIndexFunctionSemanticError(expr->symbol->value, emptySpan()));
+                            semanticThrow(newIndexFunctionSemanticError(expr->symbol->value, expr->span));
                             return TYPE_BASE_ERROR;
                     }
                 case BOUND_TYPE_PARAM:
@@ -446,12 +451,12 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                     if (paramListContains(pList, expr->symbol)) {
                         // The parameter is defined in the function
                         // This is an error as arrays are not allowed as parameters
-                        semanticThrow(newIndexScalarSemanticError(expr->symbol->value, emptySpan()));
+                        semanticThrow(newIndexScalarSemanticError(expr->symbol->value, expr->span));
                         return TYPE_BASE_ERROR;
                     }
                     // The parameter is not defined in the function
                     // This is an error
-                    semanticThrow(newUndefIdentifierSemanticError(expr->symbol->value, emptySpan()));
+                    semanticThrow(newUndefIdentifierSemanticError(expr->symbol->value, expr->span));
                     return TYPE_BASE_ERROR;
             }
             break;
@@ -467,11 +472,11 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                     switch (expr->symbol->identifier->type->plural) {
                         case TYPE_NATURE_SCALAR:
                             // This is an error
-                            semanticThrow(newCallScalarSemanticError(expr->symbol->value, emptySpan()));
+                            semanticThrow(newCallScalarSemanticError(expr->symbol->value, expr->span));
                             return TYPE_BASE_ERROR;
                         case TYPE_NATURE_ARRAY:
                             // This is an error
-                            semanticThrow(newCallArraySemanticError(expr->symbol->value, emptySpan()));
+                            semanticThrow(newCallArraySemanticError(expr->symbol->value, expr->span));
                             return TYPE_BASE_ERROR;
                         case TYPE_NATURE_FUNCTION:
                             // This is ok
@@ -485,12 +490,12 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                     if (paramListContains(pList, expr->symbol)) {
                         // The parameter is defined in the function
                         // This is an error as functions are not allowed as parameters
-                        semanticThrow(newCallScalarSemanticError(expr->symbol->value, emptySpan()));
+                        semanticThrow(newCallScalarSemanticError(expr->symbol->value, expr->span));
                         return TYPE_BASE_ERROR;
                     }
                     // The parameter is not defined in the function
                     // This is an error
-                    semanticThrow(newUndefIdentifierSemanticError(expr->symbol->value, emptySpan()));
+                    semanticThrow(newUndefIdentifierSemanticError(expr->symbol->value, expr->span));
                     return TYPE_BASE_ERROR;
             }
         case AST_EXPR_LIT_INT:
@@ -537,7 +542,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                     if (type1 == TYPE_BASE_INT || type1 == TYPE_BASE_CHAR) {
                         return big ? TYPE_BASE_INT : type1;
                     } else if (type1 != TYPE_BASE_ERROR) {
-                        semanticThrow(newWrongOperandTypeSemanticErrorBinaryRight(op, "int/char", type1, emptySpan()));
+                        semanticThrow(newWrongOperandTypeSemanticErrorBinaryRight(op, "int/char", type1, expr->children[1]->span));
                         return TYPE_BASE_ERROR;
                     } else {
                         return TYPE_BASE_ERROR;
@@ -546,13 +551,13 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                     if (type1 == TYPE_BASE_FLOAT) {
                         return TYPE_BASE_FLOAT;
                     } else if (type1 != TYPE_BASE_ERROR) {
-                        semanticThrow(newWrongOperandTypeSemanticErrorBinaryRight(op, "float", type1, emptySpan()));
+                        semanticThrow(newWrongOperandTypeSemanticErrorBinaryRight(op, "float", type1, expr->children[1]->span));
                         return TYPE_BASE_ERROR;
                     } else {
                         return TYPE_BASE_ERROR;
                     }
                 case TYPE_BASE_BOOL:
-                    semanticThrow(newWrongOperandTypeSemanticErrorBinaryLeft(op, "numeric", type0, emptySpan()));
+                    semanticThrow(newWrongOperandTypeSemanticErrorBinaryLeft(op, "numeric", type0, expr->children[0]->span));
                     return TYPE_BASE_ERROR;
                 case TYPE_BASE_ERROR:
                     // An error has already been thrown
@@ -605,7 +610,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                     if (type1 == TYPE_BASE_INT || type1 == TYPE_BASE_CHAR) {
                         return TYPE_BASE_BOOL;
                     } else if (type1 != TYPE_BASE_ERROR) {
-                        semanticThrow(newWrongOperandTypeSemanticErrorBinaryRight(op, "int/char", type1, emptySpan()));
+                        semanticThrow(newWrongOperandTypeSemanticErrorBinaryRight(op, "int/char", type1, expr->children[1]->span));
                         return TYPE_BASE_ERROR;
                     } else {
                         return TYPE_BASE_ERROR;
@@ -614,13 +619,13 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                     if (type1 == TYPE_BASE_FLOAT) {
                         return TYPE_BASE_BOOL;
                     } else if (type1 != TYPE_BASE_ERROR) {
-                        semanticThrow(newWrongOperandTypeSemanticErrorBinaryRight(op, "float", type1, emptySpan()));
+                        semanticThrow(newWrongOperandTypeSemanticErrorBinaryRight(op, "float", type1, expr->children[1]->span));
                         return TYPE_BASE_ERROR;
                     } else {
                         return TYPE_BASE_ERROR;
                     }
                 case TYPE_BASE_BOOL:
-                    semanticThrow(newWrongOperandTypeSemanticErrorBinaryLeft(op, "numeric", type0, emptySpan()));
+                    semanticThrow(newWrongOperandTypeSemanticErrorBinaryLeft(op, "numeric", type0, expr->children[0]->span));
                     return TYPE_BASE_ERROR;
                 case TYPE_BASE_ERROR:
                     // An error has already been thrown
@@ -651,13 +656,13 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                 case TYPE_BASE_INT:
                 case TYPE_BASE_CHAR:
                 case TYPE_BASE_FLOAT:
-                    semanticThrow(newWrongOperandTypeSemanticErrorBinaryLeft(op, "boolean", type0, emptySpan()));
+                    semanticThrow(newWrongOperandTypeSemanticErrorBinaryLeft(op, "boolean", type0, expr->children[0]->span));
                     return TYPE_BASE_ERROR;
                 case TYPE_BASE_BOOL:
                     if (type1 == TYPE_BASE_BOOL) {
                         return TYPE_BASE_BOOL;
                     } else if (type1 != TYPE_BASE_ERROR) {
-                        semanticThrow(newWrongOperandTypeSemanticErrorBinaryRight(op, "boolean", type1, emptySpan()));
+                        semanticThrow(newWrongOperandTypeSemanticErrorBinaryRight(op, "boolean", type1, expr->children[1]->span));
                         return TYPE_BASE_ERROR;
                     } else {
                         return TYPE_BASE_ERROR;
@@ -681,7 +686,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                 case TYPE_BASE_FLOAT:
                     return TYPE_BASE_FLOAT;
                 case TYPE_BASE_BOOL:
-                    semanticThrow(newWrongOperandTypeSemanticErrorUnary("-", "numeric", type0, emptySpan()));
+                    semanticThrow(newWrongOperandTypeSemanticErrorUnary("-", "numeric", type0, expr->children[0]->span));
                     return TYPE_BASE_ERROR;
                 case TYPE_BASE_ERROR:
                     // An error has already been thrown
@@ -698,7 +703,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                 case TYPE_BASE_INT:
                 case TYPE_BASE_CHAR:
                 case TYPE_BASE_FLOAT:
-                    semanticThrow(newWrongOperandTypeSemanticErrorUnary("~", "boolean", type0, emptySpan()));
+                    semanticThrow(newWrongOperandTypeSemanticErrorUnary("~", "boolean", type0, expr->children[0]->span));
                     return TYPE_BASE_ERROR;
                 case TYPE_BASE_BOOL:
                     return TYPE_BASE_BOOL;
@@ -754,7 +759,7 @@ void semanticCheckExpressionList(struct ast_node *expr_list, struct ParamTypeLis
                     param_type->symbol->value,
                     paramType,
                     exprType,
-                    emptySpan()));
+                    expr->span));
             continue;
         }
     }
@@ -767,6 +772,7 @@ void semanticCheckExpressionList(struct ast_node *expr_list, struct ParamTypeLis
                 func_symb->value,
                 expected_args,
                 got_args,
-                emptySpan()));
+                expr_list->span,
+                func_symb->identifier->declaration_span));
     }
 }

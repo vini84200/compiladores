@@ -7,6 +7,7 @@
 
 #include "lib.h"
 #include "y.tab.h"
+#include "lex.yy.h"
 
 
 #include <stdio.h>

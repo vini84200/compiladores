@@ -123,7 +123,7 @@ void paramTypeListAppend(ParamTypeList *list, ParamType *param_type) {
     list->tail = param_type;
     list->arg_count++;
 }
-SemanticError *setParamBound(struct HashEntry_t *symbol, Type *type, struct HashEntry_t *func_symbol) {
+SemanticError *setParamBound(struct HashEntry_t *symbol, Type *type, struct HashEntry_t *func_symbol, Span *span) {
     if (symbol == NULL) {
         criticalError("Cannot set a param bound to a NULL symbol");
     }
@@ -138,7 +138,7 @@ SemanticError *setParamBound(struct HashEntry_t *symbol, Type *type, struct Hash
         if (symbol->identifier->bound->bound_type == BOUND_TYPE_GLOBAL) {
             // The symbol already has a global bound set
             // This is an error
-            return newGlobalParamConflictSemanticError(symbol->identifier->name, emptySpan(),
+            return newGlobalParamConflictSemanticError(symbol->identifier->name, span,
                                                        symbol->identifier->declaration_span);
         } else if (symbol->identifier->bound->bound_type == BOUND_TYPE_PARAM) {
             // The symbol already has a param bound set
@@ -152,7 +152,7 @@ SemanticError *setParamBound(struct HashEntry_t *symbol, Type *type, struct Hash
                     // The param is already declared in the same function
                     // This is an error
                     destroyIdentifierIterator(iterator);
-                    return newRedefIdentifierSemanticError(symbol->identifier->name, emptySpan(),
+                    return newRedefIdentifierSemanticError(symbol->identifier->name, span,
                                                            identifier->declaration_span);
                 }
                 last = identifier;
@@ -163,13 +163,13 @@ SemanticError *setParamBound(struct HashEntry_t *symbol, Type *type, struct Hash
             }
             // The param is not already declared in the same function
             // We can add it to the list
-            last->next = newIdentifier(symbol->value, type, newParamBound(func_symbol), emptySpan());
+            last->next = newIdentifier(symbol->value, type, newParamBound(func_symbol), span);
             return NULL;
         }
     }
     // No bound set, we can set a param bound
     Bound *bound = newParamBound(func_symbol);
-    Identifier *identifier = newIdentifier(symbol->value, type, bound, emptySpan());
+    Identifier *identifier = newIdentifier(symbol->value, type, bound, span);
     symbol->identifier = identifier;
     return NULL;
 }

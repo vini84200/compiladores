@@ -68,11 +68,11 @@ program: list_declare list_implementation       { $$ = createASTProgram($1, $2, 
     ;
 
 list_declare: decl list_declare                 { $$ = createASTDeclList($1, $2, @$); }
-    | /* empty */                               { $$ = NULL; printLocation(@$); }
+    | /* empty */                               { $$ = NULL;  }
     ;
-decl:   decl_var                                { $$ = $1; printLocation(@$);}
-    | decl_array                                { $$ = $1; printLocation(@$);}
-    | decl_func                                 { $$ = $1; printLocation(@$);}
+decl:   decl_var                                { $$ = $1; }
+    | decl_array                                { $$ = $1; }
+    | decl_func                                 { $$ = $1; }
     ;
 
 type:   KW_INT                                  { $$ = createASTType(TYPE_INT,@$); }
@@ -140,7 +140,7 @@ cmd_attr_array: TK_IDENTIFIER '[' expr ']' '=' expr ';'     { $$ = createASTComm
 cmd_print: KW_PRINT expr ';'                                { $$ = createASTCommandPrintExpr($2,@$); }
         | KW_PRINT LIT_STRING ';'                           { $$ = createASTCommandPrintString($2,@$); }
 
-expr:   TK_IDENTIFIER                                   { $$ = createASTExprVar($1,@$); printLocation(@$);}
+expr:   TK_IDENTIFIER                                   { $$ = createASTExprVar($1,@$); }
     | TK_IDENTIFIER '[' expr ']'                    { $$ = createASTExprArrayGet($1, $3,@$); }
     | TK_IDENTIFIER '(' list_expr ')'               { $$ = createASTExprFuncCall($1, $3,@$); }
     | LIT_INT                                       { $$ = createASTExprLitInt($1,@$); }

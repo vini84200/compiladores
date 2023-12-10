@@ -80,7 +80,7 @@ typedef struct Identifier_t {
 
 Identifier *newIdentifier(char *name, Type *type, Bound *bound, Span *declaration_span);
 SemanticError *setGlobalBound(struct HashEntry_t *symbol, Type *type, Span *declaration_span);
-SemanticError *setParamBound(struct HashEntry_t *symbol, Type *type, struct HashEntry_t *func_symbol);
+SemanticError *setParamBound(struct HashEntry_t *symbol, Type *type, struct HashEntry_t *func_symbol, Span *span);
 
 typedef struct IdentifierIterator_t {
     Identifier *next;
