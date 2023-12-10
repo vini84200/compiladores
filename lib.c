@@ -6,6 +6,7 @@
 //
 
 #include "lib.h"
+#include "y.tab.h"
 
 
 #include <stdio.h>
@@ -43,6 +44,10 @@ void incrementCollumn(int increment) {
 }
 void user_action() {
     incrementCollumn(yyleng);
+    yylloc.first_line = yylloc.last_line = getLineNumber();
+    yylloc.first_column = getCollumn();
+    yylloc.last_column = getCollumn() + yyleng - 1;
+
 
 #ifdef DEBUG
 

@@ -18,7 +18,16 @@
 #define MAX_LINE_FOR_REPORT 512
 #include "semanticError.h"
 
-void yyerror(const char *s);
+struct YYLTYPE
+{
+    int first_line;
+    int first_column;
+    int last_line;
+    int last_column;
+    unsigned source;
+};
+
+void yyerror(struct YYLTYPE *pos, const char *s);
 void handle_syntax_error();
 int handle_wrong_arg_count(void);
 int handle_cannot_open_file(char *argv);

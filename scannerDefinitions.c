@@ -5,7 +5,6 @@
 #ifndef SCANNERDEFINITIONS_H
 #define SCANNERDEFINITIONS_H
 
-#include "errorHandler.h"
 #include "hash.h"
 #include "ast.h"
 #include "symbols.h"

@@ -7,7 +7,7 @@
 # Baseado em:
 # UFRGS - Compiladores B - Marcelo Johann - 2009/2 - Etapa 1
 
-LEX = lex
+LEX = lex --bison-bridge --bison-locations
 YACC = yacc -d -v
 CC = clang -Wall -std=c99
 

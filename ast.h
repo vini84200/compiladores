@@ -16,11 +16,13 @@ typedef struct ast_node {
     int type;
     HashEntry *symbol;
     struct ast_node *children[MAX_CHILDREN];
+    Span *span;
 } AST;
 
 void open_output_file(char *filename);
 
-AST *createAST(int type, HashEntry *symbol, AST *child0, AST *child1, AST *child2, AST *child3);
+AST *createASTnoSpan(int type, HashEntry *symbol, AST *child0, AST *child1, AST *child2, AST *child3);
+AST *createAST(int type, HashEntry *symbol, AST *child0, AST *child1, AST *child2, AST *child3, struct YYLTYPE location);
 void destroyAST(AST *node);
 
 void printAST(AST *node, int level);
@@ -86,55 +88,55 @@ void printAST(AST *node, int level);
 #define AST_COMMAND_RETURN          45
 
 
-AST *createASTProgram(AST *declaration_list, AST *code_list);
-AST *createASTDeclList(AST *declaration, AST *declaration_list);
-AST *createASTVarDecl(AST *type, HashEntry *identifier, AST *value);
-AST *createASTType(int type);
+AST *createASTProgram(AST *declaration_list, AST *code_list, struct YYLTYPE loc);
+AST *createASTDeclList(AST *declaration, AST *declaration_list, struct YYLTYPE loc);
+AST *createASTVarDecl(AST *type, HashEntry *identifier, AST *value, struct YYLTYPE loc);
+AST *createASTType(int type, struct YYLTYPE loc);
 
-AST *createASTValue(HashEntry *value);
-AST *createASTArrayDecl(AST *type, HashEntry *identifier, HashEntry *size, AST *value);
-AST *createASTArrayValues(AST *value, AST *values);
-AST *createASTFuncDecl(AST* type, HashEntry* identifier, AST* param_list);
-AST *createASTParamList(AST* param, AST* param_list);
-AST *createASTParam(AST* type, HashEntry* identifier);
+AST *createASTValue(HashEntry *value, struct YYLTYPE loc);
+AST *createASTArrayDecl(AST *type, HashEntry *identifier, HashEntry *size, AST *value, struct YYLTYPE loc);
+AST *createASTArrayValues(AST *value, AST *values, struct YYLTYPE loc);
+AST *createASTFuncDecl(AST* type, HashEntry* identifier, AST* param_list, struct YYLTYPE loc);
+AST *createASTParamList(AST* param, AST* param_list, struct YYLTYPE loc);
+AST *createASTParam(AST* type, HashEntry* identifier, struct YYLTYPE loc);
 
-AST *createASTCodeList(AST *code, AST *code_list);
-AST *createASTImplFunc(HashEntry *identifier, AST* command);
-AST *createASTEmptyCommand();
-AST *createASTCommandBlock(AST* command_list);
-AST *createASTCommandList(AST* command, AST* command_list);
+AST *createASTCodeList(AST *code, AST *code_list, struct YYLTYPE loc);
+AST *createASTImplFunc(HashEntry *identifier, AST* command, struct YYLTYPE loc);
+AST *createASTEmptyCommand(struct YYLTYPE loc);
+AST *createASTCommandBlock(AST* command_list, struct YYLTYPE loc);
+AST *createASTCommandList(AST* command, AST* command_list, struct YYLTYPE loc);
 
-AST *createASTCommandAssign(HashEntry *identifier, AST *expr);
-AST *createASTCommandAssignArray(HashEntry *identifier, AST *expr_index, AST *expr_value);
-AST *createASTCommandPrintExpr(AST *expr);
-AST *createASTCommandPrintString(HashEntry *string);
-AST *createASTCommandIf(AST *expr, AST *command_if, AST *command_else);
-AST *createASTCommandWhile(AST *expr, AST *command_while);
+AST *createASTCommandAssign(HashEntry *identifier, AST *expr, struct YYLTYPE loc);
+AST *createASTCommandAssignArray(HashEntry *identifier, AST *expr_index, AST *expr_value, struct YYLTYPE loc);
+AST *createASTCommandPrintExpr(AST *expr, struct YYLTYPE loc);
+AST *createASTCommandPrintString(HashEntry *string, struct YYLTYPE loc);
+AST *createASTCommandIf(AST *expr, AST *command_if, AST *command_else, struct YYLTYPE loc);
+AST *createASTCommandWhile(AST *expr, AST *command_while, struct YYLTYPE loc);
 
-AST *createASTExprVar(HashEntry *identifier);
-AST *createASTExprArrayGet(HashEntry *identifier, AST *expr_index);
-AST *createASTExprFuncCall(HashEntry *identifier, AST *expr_list);
-AST *createASTExprList(AST *expr, AST *expr_list);
-AST *createASTExprLitInt(HashEntry *value);
-AST *createASTExprLitFloat(HashEntry *value);
-AST *createASTExprLitChar(HashEntry *value);
-AST *createASTExprAdd(AST *expr0, AST *expr1);
-AST *createASTExprSub(AST *expr0, AST *expr1);
-AST *createASTExprMul(AST *expr0, AST *expr1);
-AST *createASTExprDiv(AST *expr0, AST *expr1);
-AST *createASTExprLess(AST *expr0, AST *expr1);
-AST *createASTExprGreater(AST *expr0, AST *expr1);
-AST *createASTExprLE(AST *expr0, AST *expr1);
-AST *createASTExprGE(AST *expr0, AST *expr1);
-AST *createASTExprEQ(AST *expr0, AST *expr1);
-AST *createASTExprNE(AST *expr0, AST *expr1);
-AST *createASTExprAnd(AST *expr0, AST *expr1);
-AST *createASTExprOr(AST *expr0, AST *expr1);
-AST *createASTExprNot(AST *expr);
-AST *createASTExprMinus(AST *expr);
-AST *createASTExprRead(AST *type);
+AST *createASTExprVar(HashEntry *identifier, struct YYLTYPE loc);
+AST *createASTExprArrayGet(HashEntry *identifier, AST *expr_index, struct YYLTYPE loc);
+AST *createASTExprFuncCall(HashEntry *identifier, AST *expr_list, struct YYLTYPE loc);
+AST *createASTExprList(AST *expr, AST *expr_list, struct YYLTYPE loc);
+AST *createASTExprLitInt(HashEntry *value, struct YYLTYPE loc);
+AST *createASTExprLitFloat(HashEntry *value, struct YYLTYPE loc);
+AST *createASTExprLitChar(HashEntry *value, struct YYLTYPE loc);
+AST *createASTExprAdd(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprSub(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprMul(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprDiv(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprLess(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprGreater(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprLE(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprGE(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprEQ(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprNE(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprAnd(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprOr(AST *expr0, AST *expr1, struct YYLTYPE loc);
+AST *createASTExprNot(AST *expr, struct YYLTYPE loc);
+AST *createASTExprMinus(AST *expr, struct YYLTYPE loc);
+AST *createASTExprRead(AST *type, struct YYLTYPE loc);
 
-AST *createASTCommandReturn(AST *expr);
+AST *createASTCommandReturn(AST *expr, struct YYLTYPE loc);
 
 typedef struct {
     AST *next;

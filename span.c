@@ -4,7 +4,10 @@
 
 #include "span.h"
 
-
+#include "ast.h"
+#include "hash.h"
+#include "y.tab.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -54,4 +57,23 @@ Span *add_spans(Span *span1, Span *span2) {
     }
 
     return new_span;
+}
+struct YYLTYPE locationSpanning(struct YYLTYPE begin, struct YYLTYPE end) {
+    struct YYLTYPE location;
+    location.first_line = begin.first_line;
+    location.first_column = begin.first_column;
+    location.last_line = end.last_line;
+    location.last_column = end.last_column;
+    return location;
+}
+Span *spanFromLocation(struct YYLTYPE *location) {
+    Span *span = (Span *) malloc(sizeof(Span));
+    span->line = location->first_line;
+    span->collumn = location->first_column;
+    span->end_line = location->last_line;
+    span->end_collumn = location->last_column;
+    return span;
+}
+void printLocation(struct YYLTYPE location) {
+    printf("Line %d:%d to %d:%d\n", location.first_line, location.first_column, location.last_line, location.last_column);
 }
