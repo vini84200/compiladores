@@ -10,21 +10,23 @@
 LEX = lex
 YACC = yacc -d -v
 CC = clang -Wall -std=c99
+NAME = etapa4
 
-all: etapa3
+all: $(NAME)
 
 debug: CC += -DDEBUG -g
 debug: all
 
 run: all
-	@(./etapa3 in)
+	@(./$(NAME) inputs/in)
 
-etapa3: lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o ast.o semantics.o span.o semanticError.o types.o
-	$(CC) -o etapa3 lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o ast.o semantics.o span.o semanticError.o types.o
+
+$(NAME): lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o ast.o semantics.o span.o semanticError.o types.o
+	$(CC) -o $(NAME) lex.yy.o main.o hash.o lib.o y.tab.o errorHandler.o symbols.o ast.o semantics.o span.o semanticError.o types.o
 
 .PHONY: clean
 clean:
-	rm *.o lex.yy.c etapa3 y.tab.c y.tab.h y.output lex.yy.h
+	rm *.o lex.yy.c $(NAME) y.tab.c y.tab.h y.output lex.yy.h
 
 main.o: main.c lib.h lex.yy.h y.tab.h errorHandler.h
 	$(CC) -c main.c
