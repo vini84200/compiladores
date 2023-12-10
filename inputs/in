@@ -1,16 +1,10 @@
 int a =1;
 float z[2];
 
-int c (char x, char e);
+int c (char x, char x);
 int d (char x, char o);
 
 code c {
-    while (~(3==3)) {
-        a = 2;
-    };
-    a = c(1,(2+3)==23,2);
-
-    return 23;
 }
 
 code d {

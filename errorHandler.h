@@ -27,6 +27,9 @@ struct YYLTYPE
     unsigned source;
 };
 
+int printLine(const int line_number);
+int printHighlight(const int column, const int count, const char *ptr_text);
+int printDoubleHighlight(const int column, const int count, const char *ptr_text, const int column2, const int count2, const char *ptr_text2);
 void yyerror(struct YYLTYPE *pos, const char *s);
 void handle_syntax_error();
 int handle_wrong_arg_count(void);
