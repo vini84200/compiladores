@@ -70,6 +70,8 @@ SemanticError *newWrongOperandTypeSemanticErrorUnary(char *identifier, char *exp
 SemanticError *newAssignTypeMismatchSemanticError(char *identifier, TypeBase expected, TypeBase got, Span *span);
 SemanticError *newIndexNotIntSemanticError(char *identifier, TypeBase got, Span *span);
 SemanticError *newReturnWrongTypeSemanticError(TypeBase expected, TypeBase got, Span *span);
+SemanticError *newWrongArgCountSemanticError(char *func_identifier,int expected, int got, Span *span);
+SemanticError *newWrongArgTypeSemanticError(char *func_identifier, char *arg_identifier, TypeBase expected, TypeBase got, Span *span);
 
 typedef struct SemanticErrorList_t {
     SemanticError *first;

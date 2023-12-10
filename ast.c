@@ -585,8 +585,10 @@ AST *getNextAST(ASTListIterator *iterator) {
     if (current != NULL) {
         iterator->next = current->children[1];
         iterator->index++;
+        return current->children[0];
+    } else {
+        return NULL;
     }
-    return current->children[0];
 }
 bool ASTIteratorDone(ASTListIterator *iterator) {
     return iterator->next == NULL;

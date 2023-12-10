@@ -18,8 +18,6 @@ SemanticError *newSemanticError(SemanticErrorType error_code, char *message, Spa
     return semantic_error;
 }
 
-#define FORMAT_(ptr, ...) saprintf(ptr, __VA_ARGS__)
-
 char *getTypeBaseName(TypeBase type);
 SemanticError *newUndefIdentifierSemanticError(char *identifier, Span *span) {
     char *message;
@@ -165,6 +163,17 @@ SemanticError *newIndexNotIntSemanticError(char *identifier, TypeBase got, Span 
     char *message;
     asprintf(&message, "Type Mismatch: Cannot index %s with %s, should be int", identifier, getTypeBaseName(got));
     return newSemanticError(SEMANTIC_INDEX_NOT_INT, message, span, NULL);
+}
+SemanticError *newWrongArgCountSemanticError(char *func_identifier, int expected, int got, Span *span) {
+    char *message;
+    asprintf(&message, "Wrong number of arguments for function %s, expected %d, got %d", func_identifier, expected,
+             got);
+    return newSemanticError(SEMANTIC_ERROR_WRONG_ARG_COUNT, message, span, NULL);
+}
+SemanticError *newWrongArgTypeSemanticError(char *func_identifier, char *arg_identifier, TypeBase expected, TypeBase got, Span *span) {
+    char *message;
+    asprintf(&message, "Wrong type for argument %s of function %s, expected %s, got %s", arg_identifier, func_identifier, getTypeBaseName(expected), getTypeBaseName(got));
+    return newSemanticError(SEMANTIC_ERROR_WRONG_ARG_TYPE, message, span, NULL);
 }
 
 char *getTypeBaseName(TypeBase type) {

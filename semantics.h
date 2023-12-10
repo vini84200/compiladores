@@ -14,7 +14,7 @@ typedef struct SemanticAnalyzer_t {
 } SemanticAnalyzer;
 
 SemanticAnalyzer *newSemanticAnalyzer(struct ast_node *ast);
-void destroyAnalyzer(SemanticAnalyzer * analyzer);
+void destroyAnalyzer(SemanticAnalyzer *a);
 void analyzeDeclarations(struct ast_node * declList);
 void analyzeProgram(const struct ast_node *ast);
 
@@ -22,7 +22,7 @@ typedef struct SemanticAnalyzerResult_t {
     SemanticErrorList *error_list;
 } SemanticAnalyzerResult;
 
-SemanticAnalyzerResult *newSemanticAnalyzerResultFromAnalyzer(const SemanticAnalyzer *analyzer);
+SemanticAnalyzerResult *newSemanticAnalyzerResultFromAnalyzer(const SemanticAnalyzer *a);
 void destroySemanticAnalyzerResult(SemanticAnalyzerResult *result);
 
 /**
@@ -37,4 +37,5 @@ void analyzeImplementations(struct ast_node *implList);
 void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type funcType);
 bool checkExpressionType(struct ast_node *expr, TypeBase type, ParamTypeList *pList);
 TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList);
+void semanticCheckExpressionList(struct ast_node *expr_list, struct ParamTypeList_t *args_types, ParamTypeList *scope_defs, HashEntry *func_symb);
 #endif //SEMANTICS_H

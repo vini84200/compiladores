@@ -38,7 +38,7 @@ void analyzeDeclarations(AST *declList) {
         }
         if (decl->type == AST_ARRAY_DECLARATION) {
             // ARRAY_DECLARATION( sym=id, $0=type, $1=size, $2=list_of_values )
-            const int size = atoi(decl->children[1]->symbol->value);
+            const int size = (int) strtol(decl->children[1]->symbol->value, NULL, 10);
             Type *type = newArrayType(getTypeBaseFromASTType(decl->children[0]), size);
             semanticTry(setGlobalBound(decl->symbol, type, emptySpan()));
             continue;
@@ -70,24 +70,20 @@ void analyzeDeclarations(AST *declList) {
     while (!SymbolIteratorDone(symbol_iterator)) {
         const HashEntry *entry = getNextSymbol(symbol_iterator);
         if (entry == NULL) {
-            printf("NULL entry\n");
             continue;
         }
         if (entry->identifier == NULL) {
             semanticTry(newUndefIdentifierSemanticError(entry->value, emptySpan()));
-        } else {
-            printf("Identifier %s is defined\n", entry->value);
-            printf("Type: %s\n", getSymbolName(entry->type));
         }
     }
     destroySymbolIterator(symbol_iterator);
 }
 
 SemanticAnalyzer *newSemanticAnalyzer(AST *ast) {
-    SemanticAnalyzer *analyzer = (SemanticAnalyzer *) malloc(sizeof(SemanticAnalyzer));
-    analyzer->ast = ast;
-    analyzer->error_list = newSemanticErrorList();
-    return analyzer;
+    SemanticAnalyzer *a = (SemanticAnalyzer *) malloc(sizeof(SemanticAnalyzer));
+    a->ast = ast;
+    a->error_list = newSemanticErrorList();
+    return a;
 }
 
 
@@ -113,7 +109,7 @@ void analyzeImplementations(struct ast_node *implList) {
                 semanticThrow(newIsNotAFunctionSemanticError(impl->symbol->value, emptySpan()));
                 continue;
             }
-            // The symbol is a function and it's defined
+            // The symbol is a function, and it's defined
             // Can only be implemented once
             if (impl->symbol->implemented) {
                 semanticThrow(newFunctionReimplementationSemanticError(impl->symbol->value, emptySpan(),
@@ -151,14 +147,14 @@ void analyzeImplementations(struct ast_node *implList) {
 }
 
 
-SemanticAnalyzerResult *newSemanticAnalyzerResultFromAnalyzer(const SemanticAnalyzer *analyzer) {
+SemanticAnalyzerResult *newSemanticAnalyzerResultFromAnalyzer(const SemanticAnalyzer *a) {
     SemanticAnalyzerResult *result = (SemanticAnalyzerResult *) malloc(sizeof(SemanticAnalyzerResult));
-    result->error_list = analyzer->error_list;
+    result->error_list = a->error_list;
     return result;
 }
 
-void destroyAnalyzer(SemanticAnalyzer *analyzer) {
-    free(analyzer);
+void destroyAnalyzer(SemanticAnalyzer *a) {
+    free(a);
     // We don't destroy the AST because it's not ours
     // We don't destroy the error list because it will be used by the result
 }
@@ -192,8 +188,6 @@ void destroySemanticErrorList(SemanticErrorList *pList) {
     free(pList);
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
 void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type funcType) {
     if (cmd->type == AST_EMPTY_COMMAND) {
         // Nothing to do
@@ -205,8 +199,8 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
         ASTListIterator *iterator = createASTListIterator(cmd->children[0]);
         while (!ASTIteratorDone(iterator)) {
 
-            const AST *cmd = getNextAST(iterator);
-            analyzeCommand(cmd, pList, funcType);
+            AST *internalCmd = getNextAST(iterator);
+            analyzeCommand(internalCmd, pList, funcType);
         }
         destroyASTListIterator(iterator);
         return;
@@ -222,7 +216,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
         if (cmd->symbol->identifier->bound->bound_type == BOUND_TYPE_PARAM) {
             // The identifier is a parameter
             // Check if the parameter is defined in the function
-            if (paramListContains(pList, cmd->symbol->identifier->bound->symbol)) {
+            if (paramListContains(pList, cmd->symbol)) {
                 // The parameter is defined in the function
                 // This is an error as we can't assign to a parameter
                 semanticThrow(newAssignToParamSemanticError(cmd->symbol->value, emptySpan()));
@@ -276,7 +270,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
         if (cmd->symbol->identifier->bound->bound_type == BOUND_TYPE_PARAM) {
             // The identifier is a parameter
             // Check if the parameter is defined in the function
-            if (paramListContains(pList, cmd->symbol->identifier->bound->symbol)) {
+            if (paramListContains(pList, cmd->symbol)) {
                 // The parameter is defined in the function
                 // This is an error as we can't assign to a parameter
                 semanticThrow(newAssignToParamSemanticError(cmd->symbol->value, emptySpan()));
@@ -326,7 +320,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
     }
     if (cmd->type == AST_COMMAND_PRINT_EXPR) {
         // PRINT_EXPR( $0=expr )
-        TypeBase exprType = getExpressionType(cmd->children[0], pList);
+        getExpressionType(cmd->children[0], pList);
         return;
     }
     if (cmd->type == AST_COMMAND_PRINT_STRING) {
@@ -403,7 +397,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                 case BOUND_TYPE_PARAM:
                     // The identifier is a parameter
                     // Check if the parameter is defined in the function
-                    if (paramListContains(pList, expr->symbol->identifier->bound->symbol)) {
+                    if (paramListContains(pList, expr->symbol)) {
                         // The parameter is defined in the function
                         // This is ok
                         // Parameters are always scalars
@@ -449,7 +443,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                 case BOUND_TYPE_PARAM:
                     // The identifier is a parameter
                     // Check if the parameter is defined in the function
-                    if (paramListContains(pList, expr->symbol->identifier->bound->symbol)) {
+                    if (paramListContains(pList, expr->symbol)) {
                         // The parameter is defined in the function
                         // This is an error as arrays are not allowed as parameters
                         semanticThrow(newIndexScalarSemanticError(expr->symbol->value, emptySpan()));
@@ -481,13 +475,14 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
                             return TYPE_BASE_ERROR;
                         case TYPE_NATURE_FUNCTION:
                             // This is ok
-                            // TODO: Check the arguments
+                            semanticCheckExpressionList(expr->children[0], expr->symbol->identifier->type->arg_list,
+                                                        pList, expr->symbol);
                             return expr->symbol->identifier->type->base;
                     }
                 case BOUND_TYPE_PARAM:
                     // The identifier is a parameter
                     // Check if the parameter is defined in the function
-                    if (paramListContains(pList, expr->symbol->identifier->bound->symbol)) {
+                    if (paramListContains(pList, expr->symbol)) {
                         // The parameter is defined in the function
                         // This is an error as functions are not allowed as parameters
                         semanticThrow(newCallScalarSemanticError(expr->symbol->value, emptySpan()));
@@ -604,7 +599,6 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
             }
             TypeBase type0 = getExpressionType(expr->children[0], pList);
             TypeBase type1 = getExpressionType(expr->children[1], pList);
-            bool big = false;
             switch (type0) {
                 case TYPE_BASE_INT:
                 case TYPE_BASE_CHAR:
@@ -719,5 +713,60 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
             // READ( $0=type )
             // The type is the declared type in the read command
             return getTypeBaseFromASTType(expr->children[0]);
+    }
+    criticalError("Invalid expression type");
+}
+void semanticCheckExpressionList(struct ast_node *expr_list, struct ParamTypeList_t *args_types, ParamTypeList *scope_defs, HashEntry *func_symb) {
+    ASTListIterator *iterator = createASTListIterator(expr_list);
+    ParamIterator *param_iterator = newParamIterator(args_types);
+    if (func_symb == NULL) {
+        criticalError("Function symbol cannot be NULL");
+    }
+    int expected_args = 0;
+    int got_args = 0;
+    while (!ASTIteratorDone(iterator) || !paramIteratorDone(param_iterator)) {
+        AST *expr = getNextAST(iterator);
+        ParamType *param_type = getNextParam(param_iterator);
+        if (param_type == NULL) {
+            // There are more expressions than parameters
+            // Continue to check the expressions and count the arguments
+            getExpressionType(expr, scope_defs);
+            got_args++;
+            continue;
+        } else {
+            expected_args++;
+        }
+        if (expr == NULL) {
+            // There are more parameters than expressions
+            // This is an error
+            // Continue to check the parameters and count the arguments
+            continue;
+        } else {
+            got_args++;
+        }
+        TypeBase exprType = getExpressionType(expr, scope_defs);
+        TypeBase paramType = param_type->type->base;
+        if (!isCompatible(paramType, exprType) && exprType != TYPE_BASE_ERROR) {
+            // The expression is not of the same type as the parameter
+            // This is an error
+            semanticThrow(newWrongArgTypeSemanticError(
+                    func_symb->value,
+                    param_type->symbol->value,
+                    paramType,
+                    exprType,
+                    emptySpan()));
+            continue;
+        }
+    }
+    destroyASTListIterator(iterator);
+    destroyParamIterator(param_iterator);
+    if (expected_args != got_args) {
+        // The number of arguments is not the same as the number of parameters
+        // This is an error
+        semanticThrow(newWrongArgCountSemanticError(
+                func_symb->value,
+                expected_args,
+                got_args,
+                emptySpan()));
     }
 }
