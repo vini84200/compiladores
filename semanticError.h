@@ -35,6 +35,7 @@ typedef enum SemanticErrorType_t {
     SEMANTIC_ERROR_WRONG_ARG_COUNT,
     SEMANTIC_ERROR_WRONG_ARG_TYPE,
     SEMANTIC_ERROR_INITIAIZED_WITH_WRONG_TYPE,
+    SEMANTIC_ERROR_ARRAY_INITIAIZED_WITH_TOO_MANY_VALUES,
 } SemanticErrorType;
 
 
@@ -78,6 +79,7 @@ SemanticError *newReturnWrongTypeSemanticError(TypeBase expected, TypeBase got, 
 SemanticError *newWrongArgCountSemanticError(char *func_identifier,int expected, int got, Span *span, Span *original_declaration_span);
 SemanticError *newWrongArgTypeSemanticError(char *func_identifier, char *arg_identifier, TypeBase expected, TypeBase got, Span *span);
 SemanticError *newInitializedWithWrongTypeSemanticError(char *identifier, TypeBase expected, TypeBase got, Span *span);
+SemanticError *newArrayInitializedWithTooManyValuesSemanticError(char *identifier, int expected, int got, Span *span);
 
 typedef struct SemanticErrorList_t {
     SemanticError *first;

@@ -200,6 +200,18 @@ SemanticError *newInitializedWithWrongTypeSemanticError(char *identifier, TypeBa
             "Type Mismatch",
             "");
 }
+SemanticError *newArrayInitializedWithTooManyValuesSemanticError(char *identifier, int expected, int got, Span *span) {
+    char *message;
+    asprintf(&message, "Array size Mismatch: Cannot initialize %s with %d values, should be at most %d", identifier, got,
+             expected);
+    return newSemanticErrorWithMessages(
+            SEMANTIC_ERROR_ARRAY_INITIAIZED_WITH_TOO_MANY_VALUES,
+            message,
+            span,
+            NULL,
+            "Array size Mismatch",
+            "");
+}
 
 char *getTypeBaseName(TypeBase type) {
     switch (type) {

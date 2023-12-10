@@ -39,9 +39,9 @@ void analyzeDeclarations(AST *declList) {
                 // The value is not of the same type as the variable
                 // This is an error
                 semanticThrow(newInitializedWithWrongTypeSemanticError(decl->symbol->value,
-                                                                 type->base,
-                                                                 providedType,
-                                                                 decl->children[1]->span));
+                                                                       type->base,
+                                                                       providedType,
+                                                                       decl->children[1]->span));
                 continue;
             }
             continue;
@@ -52,11 +52,13 @@ void analyzeDeclarations(AST *declList) {
             Type *type = newArrayType(getTypeBaseFromASTType(decl->children[0]), size);
             semanticTry(setGlobalBound(decl->symbol, type, decl->span));
             // TODO: Check if the values are of the same type as the variable
+            int providedSize = 0;
             if (decl->children[2] != NULL) {
                 // Check the type of the values
                 ASTListIterator *value_iterator = createASTListIterator(decl->children[2]);
                 while (!ASTIteratorDone(value_iterator)) {
                     const AST *value = getNextAST(value_iterator);
+                    providedSize++;
                     TypeBase providedType = getTypeBaseFromASTType(value);
                     if (!isCompatible(type->base, providedType) && providedType != TYPE_BASE_ERROR) {
                         // The value is not of the same type as the variable
@@ -69,6 +71,17 @@ void analyzeDeclarations(AST *declList) {
                     }
                 }
                 destroyASTListIterator(value_iterator);
+            }
+            // TODO: Should we allow an array to be initialized with less values than it's size?
+            // We can initialize an array with 0 values, so it should be ok
+            if (providedSize > size) {
+                // The array is initialized with more values than it's size
+                // This is an error
+                semanticThrow(newArrayInitializedWithTooManyValuesSemanticError(
+                        decl->symbol->value,
+                        size,
+                        providedSize,
+                        decl->children[2]->span));
             }
             continue;
         }
@@ -329,7 +342,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
                 semanticThrow(newAssignTypeMismatchSemanticError(cmd->symbol->value,
                                                                  cmd->symbol->identifier->type->base,
                                                                  getExpressionType(cmd->children[1], pList),
-                                                                cmd->children[1]->span));
+                                                                 cmd->children[1]->span));
                 return;
             }
             if (cmd->symbol->identifier->type->plural == TYPE_NATURE_ARRAY) {
