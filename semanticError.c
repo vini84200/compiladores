@@ -3,11 +3,12 @@
 //
 
 #include "semanticError.h"
+#include "types.h"
 
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
-SemanticError *newSemanticError(int error_code, char *message, Span *span, Span *secondary_span) {
+SemanticError *newSemanticError(SemanticErrorType error_code, char *message, Span *span, Span *secondary_span) {
     SemanticError *semantic_error = (SemanticError *) malloc(sizeof(SemanticError));
     semantic_error->error_code = error_code;
     semantic_error->message = message;
@@ -19,6 +20,7 @@ SemanticError *newSemanticError(int error_code, char *message, Span *span, Span 
 
 #define FORMAT_(ptr, ...) saprintf(ptr, __VA_ARGS__)
 
+char *getTypeBaseName(TypeBase type);
 SemanticError *newUndefIdentifierSemanticError(char *identifier, Span *span) {
     char *message;
     asprintf(&message, "Undefined identifier %s", identifier);
@@ -62,4 +64,124 @@ SemanticError *semanticErrorIteratorNext(SemanticErrorIterator *iterator) {
 }
 bool semanticErrorIteratorDone(SemanticErrorIterator *iterator) {
     return iterator->next == NULL;
+}
+SemanticError *newIsNotAFunctionSemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Identifier %s is not a function", identifier);
+    return newSemanticError(SEMANTIC_ERROR_IS_NOT_A_FUNCTION, message, span, NULL);
+}
+SemanticError *newFunctionReimplementationSemanticError(char *identifier, Span *span, Span *original_impl_span) {
+    char *message;
+    asprintf(&message, "Function %s is already implemented", identifier);
+    return newSemanticError(SEMANTIC_ERROR_FUNCTION_REIMPLEMENTATION, message, span, original_impl_span);
+}
+SemanticError *newFunctionNotImplementedSemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Function %s is not implemented", identifier);
+    return newSemanticError(SEMANTIC_ERROR_FUNCTION_NOT_IMPLEMENTED, message, span, NULL);
+}
+SemanticError *newFunctionNotDeclaredSemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Function %s is not declared", identifier);
+    return newSemanticError(SEMANTIC_ERROR_FUNCTION_NOT_DECLARED, message, span, NULL);
+}
+SemanticError *newAssignToParamSemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Cannot assign to parameter %s, parameters are read-only", identifier);
+    return newSemanticError(SEMANTIC_ERROR_ASSIGN_TO_PARAM, message, span, NULL);
+}
+SemanticError *newAssignToArraySemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Cannot assign to array %s, arrays cannot be directly assigned, use an index", identifier);
+    return newSemanticError(SEMANTIC_ERROR_ASSIGN_TO_ARRAY, message, span, NULL);
+}
+SemanticError *newAssignToFunctionSemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Cannot assign to function %s, functions cannot be assigned", identifier);
+    return newSemanticError(SEMANTIC_ERROR_ASSIGN_TO_FUNCTION, message, span, NULL);
+}
+SemanticError *newReadFromArraySemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Cannot read from array %s, arrays cannot be directly read, use an index", identifier);
+    return newSemanticError(SEMANTIC_ERROR_READ_FROM_ARRAY, message, span, NULL);
+}
+SemanticError *newReadFromFunctionSemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Cannot read from function %s, functions cannot be read. Call the function instead", identifier);
+    return newSemanticError(SEMANTIC_ERROR_READ_FROM_FUNCTION, message, span, NULL);
+}
+SemanticError *newIndexScalarSemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Cannot index scalar %s, only arrays can be indexed", identifier);
+    return newSemanticError(SEMANTIC_ERROR_INDEX_SCALAR, message, span, NULL);
+}
+SemanticError *newIndexFunctionSemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Cannot index function %s, only arrays can be indexed", identifier);
+    return newSemanticError(SEMANTIC_ERROR_INDEX_FUNCTION, message, span, NULL);
+}
+SemanticError *newCallScalarSemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Cannot call scalar %s, only functions can be called", identifier);
+    return newSemanticError(SEMANTIC_ERROR_CALL_SCALAR, message, span, NULL);
+}
+SemanticError *newCallArraySemanticError(char *identifier, Span *span) {
+    char *message;
+    asprintf(&message, "Cannot call array %s, only functions can be called", identifier);
+    return newSemanticError(SEMANTIC_ERROR_CALL_ARRAY, message, span, NULL);
+}
+
+SemanticError *newWrongOperandTypeSemanticErrorBinaryLeft(char *identifier, char *expected, TypeBase got, Span *span) {
+    char *message;
+    asprintf(&message, "Wrong operand type for operator %s on left side, expected %s, got %s", identifier, expected,
+             getTypeBaseName(got));
+    return newSemanticError(SEMANTIC_ERROR_WRONG_OPERAND_TYPE_BINARY, message, span, NULL);
+}
+SemanticError *newWrongOperandTypeSemanticErrorBinaryRight(char *identifier, char *expected, TypeBase got, Span *span) {
+    char *message;
+    asprintf(&message, "Wrong operand type for operator %s on right side, expected %s, got %s", identifier, expected,
+             getTypeBaseName(got));
+    return newSemanticError(SEMANTIC_ERROR_WRONG_OPERAND_TYPE_BINARY, message, span, NULL);
+}
+SemanticError *newWrongOperandTypeSemanticErrorUnary(char *identifier, char *expected, TypeBase got, Span *span) {
+    char *message;
+    asprintf(&message, "Wrong operand type for operator %s, expected %s, got %s", identifier, expected,
+             getTypeBaseName(got));
+    return newSemanticError(SEMANTIC_ERROR_WRONG_OPERAND_TYPE_BINARY, message, span, NULL);
+}
+SemanticError *newAssignTypeMismatchSemanticError(char *identifier, TypeBase expected, TypeBase got, Span *span) {
+    char *message;
+    asprintf(&message, "Type Mismatch: Cannot assign %s to %s, should be %s", getTypeBaseName(got), identifier,
+             getTypeBaseName(expected));
+    return newSemanticError(SEMANTIC_ERROR_ASSIGN_TYPE_MISMATCH, message, span, NULL);
+}
+SemanticError *newReturnWrongTypeSemanticError(TypeBase expected, TypeBase got, Span *span) {
+    char *message;
+    asprintf(&message, "Type Mismatch: Cannot return %s, should be %s", getTypeBaseName(got),
+             getTypeBaseName(expected));
+    return newSemanticError(SEMANTIC_ERROR_WRONG_RETURN_TYPE, message, span, NULL);
+}
+SemanticError *newIndexNotIntSemanticError(char *identifier, TypeBase got, Span *span) {
+    char *message;
+    asprintf(&message, "Type Mismatch: Cannot index %s with %s, should be int", identifier, getTypeBaseName(got));
+    return newSemanticError(SEMANTIC_INDEX_NOT_INT, message, span, NULL);
+}
+
+char *getTypeBaseName(TypeBase type) {
+    switch (type) {
+        case TYPE_BASE_INT:
+            return "int";
+        case TYPE_BASE_FLOAT:
+            return "float";
+        case TYPE_BASE_BOOL:
+            return "boolean";
+        case TYPE_BASE_ERROR:
+            return "error";
+        default:
+            return "unknown";
+        case TYPE_BASE_CHAR:
+            return "char";
+        case TYPE_BASE_STRING:
+            return "string";
+    }
 }

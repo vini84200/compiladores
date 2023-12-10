@@ -29,8 +29,12 @@ void destroySemanticAnalyzerResult(SemanticAnalyzerResult *result);
  * \brief Analyze the semantics of a generated AST, checking for semantic errors
  * \param ast The AST to be analyzed, must be of type AST_PROGRAM
  */
-SemanticAnalyzerResult *anylzeSemantic(AST *ast);
+SemanticAnalyzerResult *analyzeSemantics(AST *ast);
 
 
-
+void destroySemanticErrorList(SemanticErrorList *pList);
+void analyzeImplementations(struct ast_node *implList);
+void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type funcType);
+bool checkExpressionType(struct ast_node *expr, TypeBase type, ParamTypeList *pList);
+TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList);
 #endif //SEMANTICS_H

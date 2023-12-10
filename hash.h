@@ -16,6 +16,7 @@ typedef struct HashEntry_t {
     SymbolType type;
     char *value;
     Identifier *identifier;
+    bool implemented;
     struct HashEntry_t *nextInHashBucket;
     struct HashEntry_t *nextOfTheSameType;
 } HashEntry;

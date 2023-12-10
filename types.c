@@ -21,6 +21,15 @@ TypeBase getTypeBaseFromASTType(const struct ast_node *type) {
             return TYPE_BASE_FLOAT;
         case AST_TYPE_CHAR:
             return TYPE_BASE_CHAR;
+        case AST_VALUE:
+            return getTypeBaseFromASTType(type->children[0]);
+        case AST_EXPR_LIT_INT:
+            return TYPE_BASE_INT;
+        case AST_EXPR_LIT_FLOAT:
+            return TYPE_BASE_FLOAT;
+        case AST_EXPR_LIT_CHAR:
+            return TYPE_BASE_CHAR;
+
         default:
             criticalError("Cannot get type base from AST");
     }
@@ -142,6 +151,7 @@ SemanticError *setParamBound(struct HashEntry_t *symbol, Type *type, struct Hash
                 if (identifier->bound->symbol == func_symbol) {
                     // The param is already declared in the same function
                     // This is an error
+                    destroyIdentifierIterator(iterator);
                     return newRedefIdentifierSemanticError(symbol->identifier->name, emptySpan(),
                                                            identifier->declaration_span);
                 }
@@ -155,7 +165,6 @@ SemanticError *setParamBound(struct HashEntry_t *symbol, Type *type, struct Hash
             // We can add it to the list
             last->next = newIdentifier(symbol->value, type, newParamBound(func_symbol), emptySpan());
             return NULL;
-
         }
     }
     // No bound set, we can set a param bound
@@ -189,4 +198,50 @@ Type *newFunctionType(TypeBase returnType, ParamTypeList *param_list) {
 }
 void destroyIdentifierIterator(IdentifierIterator *iterator) {
     free(iterator);
+}
+ParamIterator *newParamIterator(ParamTypeList *list) {
+    ParamIterator *iterator = (ParamIterator *) malloc(sizeof(ParamIterator));
+    iterator->next = list->head;
+    return iterator;
+}
+ParamType *getNextParam(ParamIterator *iterator) {
+    ParamType *current = iterator->next;
+    if (current != NULL) {
+        iterator->next = current->next;
+    }
+    return current;
+}
+bool paramIteratorDone(ParamIterator *iterator) {
+    return iterator->next == NULL;
+}
+void destroyParamIterator(ParamIterator *iterator) {
+    free(iterator);
+}
+bool paramListContains(ParamTypeList *list, struct HashEntry_t *symbol) {
+    ParamIterator *iterator = newParamIterator(list);
+    while (!paramIteratorDone(iterator)) {
+        ParamType *param_type = getNextParam(iterator);
+        if (param_type->symbol == symbol) {
+            destroyParamIterator(iterator);
+            return true;
+        }
+    }
+    destroyParamIterator(iterator);
+    return false;
+}
+bool isCompatible(TypeBase expected, TypeBase got) {
+    switch (expected) {
+        case TYPE_BASE_INT:
+            return got == TYPE_BASE_INT || got == TYPE_BASE_CHAR;
+        case TYPE_BASE_FLOAT:
+            return got == TYPE_BASE_FLOAT;
+        case TYPE_BASE_CHAR:
+            return got == TYPE_BASE_CHAR || got == TYPE_BASE_INT;
+        case TYPE_BASE_STRING:
+            return got == TYPE_BASE_STRING;
+        case TYPE_BASE_BOOL:
+            return got == TYPE_BASE_BOOL;
+        case TYPE_BASE_ERROR:
+            return true;
+    }
 }

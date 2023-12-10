@@ -7,18 +7,19 @@
 #include "semanticError.h"
 #include "span.h"
 
-typedef enum _TypeNature {
+typedef enum TypeNature_t {
     TYPE_NATURE_SCALAR,
     TYPE_NATURE_ARRAY,
     TYPE_NATURE_FUNCTION
 } TypePlural;
 
-typedef enum _TypeBase {
+typedef enum TypeBase_t {
     TYPE_BASE_INT,
     TYPE_BASE_FLOAT,
     TYPE_BASE_CHAR,
     TYPE_BASE_STRING,
-    TYPE_BASE_BOOL
+    TYPE_BASE_BOOL,
+    TYPE_BASE_ERROR
 } TypeBase;
 
 struct ast_node;
@@ -89,6 +90,20 @@ IdentifierIterator *newIdentifierIterator(Identifier *head);
 Identifier *getNextIdentifier(IdentifierIterator *iterator);
 bool identifierIteratorDone(IdentifierIterator *iterator);
 void destroyIdentifierIterator(IdentifierIterator *iterator);
+
+typedef struct ParamIterator_t {
+    ParamType *next;
+} ParamIterator;
+
+ParamIterator *newParamIterator(ParamTypeList *list);
+ParamType *getNextParam(ParamIterator *iterator);
+bool paramIteratorDone(ParamIterator *iterator);
+void destroyParamIterator(ParamIterator *iterator);
+
+bool paramListContains(ParamTypeList *list, struct HashEntry_t *symbol);
+
+bool isCompatible(TypeBase expected, TypeBase got);
+
 
 
 #endif//TYPES_H

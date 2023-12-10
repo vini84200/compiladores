@@ -33,7 +33,7 @@ int main(const int argc, char **argv) {
     printf("Leitura concluída com sucesso!\n");
     // hashPrint(getSymbolTable());
     printf("Iniciando análise semântica...\n");
-    SemanticAnalyzerResult *result = anylzeSemantic(getAST());
+    SemanticAnalyzerResult *result = analyzeSemantics(getAST());
     if (result->error_list->first != NULL) {
         handle_semantic_errors(result->error_list);
     }

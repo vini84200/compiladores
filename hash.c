@@ -53,6 +53,7 @@ HashEntry *hashInsert(HashTable *table, int type, char *value) {
     newEntry->nextInHashBucket = originalAtAddress;
     newEntry->nextOfTheSameType = NULL;
     newEntry->identifier = NULL;
+    newEntry->implemented = false;
     strcpy(newEntry->value, value);
 
 
