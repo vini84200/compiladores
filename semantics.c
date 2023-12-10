@@ -34,7 +34,16 @@ void analyzeDeclarations(AST *declList) {
             // VAR_DECLARATION( sym=id, $0=type, $1=value )
             Type *type = newScalarType(getTypeBaseFromASTType(decl->children[0]));
             semanticTry((setGlobalBound(decl->symbol, type, decl->span)));
-            // TODO: Check if the value is of the same type as the variable
+            TypeBase providedType = getTypeBaseFromASTType(decl->children[1]);
+            if (!isCompatible(type->base, providedType) && providedType != TYPE_BASE_ERROR) {
+                // The value is not of the same type as the variable
+                // This is an error
+                semanticThrow(newInitializedWithWrongTypeSemanticError(decl->symbol->value,
+                                                                 type->base,
+                                                                 providedType,
+                                                                 decl->children[1]->span));
+                continue;
+            }
             continue;
         }
         if (decl->type == AST_ARRAY_DECLARATION) {
@@ -43,6 +52,24 @@ void analyzeDeclarations(AST *declList) {
             Type *type = newArrayType(getTypeBaseFromASTType(decl->children[0]), size);
             semanticTry(setGlobalBound(decl->symbol, type, decl->span));
             // TODO: Check if the values are of the same type as the variable
+            if (decl->children[2] != NULL) {
+                // Check the type of the values
+                ASTListIterator *value_iterator = createASTListIterator(decl->children[2]);
+                while (!ASTIteratorDone(value_iterator)) {
+                    const AST *value = getNextAST(value_iterator);
+                    TypeBase providedType = getTypeBaseFromASTType(value);
+                    if (!isCompatible(type->base, providedType) && providedType != TYPE_BASE_ERROR) {
+                        // The value is not of the same type as the variable
+                        // This is an error
+                        semanticThrow(newInitializedWithWrongTypeSemanticError(decl->symbol->value,
+                                                                               type->base,
+                                                                               providedType,
+                                                                               value->span));
+                        continue;
+                    }
+                }
+                destroyASTListIterator(value_iterator);
+            }
             continue;
         }
         if (decl->type == AST_FUNC_DECLARATION) {
@@ -75,9 +102,8 @@ void analyzeDeclarations(AST *declList) {
             continue;
         }
         if (entry->identifier == NULL) {
-            //TODO: Move this to the implementation checking phase so we can give a better error message
-            // We can't know where the identifier was used, so we can't give a good error message
-            semanticTry(newUndefIdentifierSemanticError(entry->value, emptySpan()));
+            // The identifier is not defined
+            // This will be thrown in the implementations when a not defined identifier is used
         }
     }
     destroySymbolIterator(symbol_iterator);
@@ -214,7 +240,7 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
         // Check if the identifier is defined in global scope
         if (cmd->symbol->identifier == NULL) {
             // The identifier is not defined
-            // This has already been checked in the declarations, so we can skip it
+            semanticThrow(newUndefIdentifierSemanticError(cmd->symbol->value, cmd->span));
             return;
         }
         if (cmd->symbol->identifier->bound->bound_type == BOUND_TYPE_PARAM) {
@@ -379,7 +405,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
             // VALUE( sym=id )
             if (expr->symbol->identifier == NULL) {
                 // The identifier is not defined
-                // This has already been checked in the declarations, so we can skip it
+                semanticThrow(newUndefIdentifierSemanticError(expr->symbol->value, expr->span));
                 return TYPE_BASE_ERROR;
             }
             switch (expr->symbol->identifier->bound->bound_type) {
@@ -418,7 +444,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
             // ARRAY_GET( sym=id, $0=expr )
             if (expr->symbol->identifier == NULL) {
                 // The identifier is not defined
-                // This has already been checked in the declarations, so we can skip it
+                semanticThrow(newUndefIdentifierSemanticError(expr->symbol->value, expr->span));
                 return TYPE_BASE_ERROR;
             }
             switch (expr->symbol->identifier->bound->bound_type) {
@@ -463,7 +489,7 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
         case AST_EXPR_FUNC_CALL:
             if (expr->symbol->identifier == NULL) {
                 // The identifier is not defined
-                // This has already been checked in the declarations, so we can skip it
+                semanticThrow(newUndefIdentifierSemanticError(expr->symbol->value, expr->span));
                 return TYPE_BASE_ERROR;
             }
             switch (expr->symbol->identifier->bound->bound_type) {

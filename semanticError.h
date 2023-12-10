@@ -33,7 +33,8 @@ typedef enum SemanticErrorType_t {
     SEMANTIC_INDEX_NOT_INT,
     SEMANTIC_ERROR_WRONG_RETURN_TYPE,
     SEMANTIC_ERROR_WRONG_ARG_COUNT,
-    SEMANTIC_ERROR_WRONG_ARG_TYPE
+    SEMANTIC_ERROR_WRONG_ARG_TYPE,
+    SEMANTIC_ERROR_INITIAIZED_WITH_WRONG_TYPE,
 } SemanticErrorType;
 
 
@@ -76,6 +77,7 @@ SemanticError *newIndexNotIntSemanticError(char *identifier, TypeBase got, Span 
 SemanticError *newReturnWrongTypeSemanticError(TypeBase expected, TypeBase got, Span *span);
 SemanticError *newWrongArgCountSemanticError(char *func_identifier,int expected, int got, Span *span, Span *original_declaration_span);
 SemanticError *newWrongArgTypeSemanticError(char *func_identifier, char *arg_identifier, TypeBase expected, TypeBase got, Span *span);
+SemanticError *newInitializedWithWrongTypeSemanticError(char *identifier, TypeBase expected, TypeBase got, Span *span);
 
 typedef struct SemanticErrorList_t {
     SemanticError *first;

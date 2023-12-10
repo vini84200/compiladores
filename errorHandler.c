@@ -36,7 +36,6 @@ void semantic_error_print_spans(SemanticError *error) {
         // Determine which span is the first and which is the second
         if (error->span->line == error->secondary_span->line) {
             // Same line
-            // TODO: print the line with both spans
             printLine(error->span->line - 1);
             printLine(error->span->line);
             printDoubleHighlight(error->span->collumn, error->span->end_collumn - error->span->collumn + 1, error->span_text, error->secondary_span->collumn, error->secondary_span->end_collumn - error->secondary_span->collumn + 1, error->secondary_span_text);

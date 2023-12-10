@@ -22,7 +22,18 @@ TypeBase getTypeBaseFromASTType(const struct ast_node *type) {
         case AST_TYPE_CHAR:
             return TYPE_BASE_CHAR;
         case AST_VALUE:
-            return getTypeBaseFromASTType(type->children[0]);
+        {
+            switch (type->symbol->type) {
+                case SYMBOL_LIT_INT:
+                    return TYPE_BASE_INT;
+                case SYMBOL_LIT_FLOAT:
+                    return TYPE_BASE_FLOAT;
+                case SYMBOL_LIT_CHAR:
+                    return TYPE_BASE_CHAR;
+                default:
+                    criticalError("Cannot get type base from AST");
+            }
+        }
         case AST_EXPR_LIT_INT:
             return TYPE_BASE_INT;
         case AST_EXPR_LIT_FLOAT:

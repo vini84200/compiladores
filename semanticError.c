@@ -188,6 +188,18 @@ SemanticError *newSemanticErrorWithMessages(SemanticErrorType error_code, char *
     semantic_error->next = NULL;
     return semantic_error;
 }
+SemanticError *newInitializedWithWrongTypeSemanticError(char *identifier, TypeBase expected, TypeBase got, Span *span) {
+    char *message;
+    asprintf(&message, "Type Mismatch: Cannot initialize %s with %s, should be %s", identifier, getTypeBaseName(got),
+             getTypeBaseName(expected));
+    return newSemanticErrorWithMessages(
+            SEMANTIC_ERROR_INITIAIZED_WITH_WRONG_TYPE,
+            message,
+            span,
+            NULL,
+            "Type Mismatch",
+            "");
+}
 
 char *getTypeBaseName(TypeBase type) {
     switch (type) {

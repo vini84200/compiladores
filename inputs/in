@@ -1,10 +1,15 @@
-int a =1;
-float z[2];
+int a ='2';
+float z[2] 1.2 3.3;
 
-int c (char x, char x);
+int c (char x, char e);
 int d (char x, char o);
 
 code c {
+    g = 2;
+    g[2] = 3;
+    a= g(3);
+    a = g;
+    a = g[2];
 }
 
 code d {
