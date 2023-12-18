@@ -259,15 +259,24 @@ void analyzeCommand(struct ast_node *cmd, struct ParamTypeList_t *pList, Type fu
         if (cmd->symbol->identifier->bound->bound_type == BOUND_TYPE_PARAM) {
             // The identifier is a parameter
             // Check if the parameter is defined in the function
-            if (paramListContains(pList, cmd->symbol)) {
-                // The parameter is defined in the function
-                // This is an error as we can't assign to a parameter
-                semanticThrow(newAssignToParamSemanticError(cmd->symbol->value, cmd->span));
+            if (!paramListContains(pList, cmd->symbol)) {
+                // The parameter is not defined in the function
+                // This is an error
+                semanticThrow(newUndefIdentifierSemanticError(cmd->symbol->value, cmd->span));
                 return;
             }
-            // The parameter is not defined in the function
-            // This is an error
-            semanticThrow(newUndefIdentifierSemanticError(cmd->symbol->value, cmd->span));
+            // The parameter is defined in the function
+            TypeBase type = cmd->symbol->identifier->type->base;
+            TypeBase exprType = getExpressionType(cmd->children[0], pList);
+            if (!isCompatible(type, exprType) && exprType != TYPE_BASE_ERROR) {
+                // The expression is not of the same type as the variable
+                // This is an error
+                semanticThrow(newAssignTypeMismatchSemanticError(cmd->symbol->value,
+                                                                 type,
+                                                                 exprType,
+                                                                 cmd->children[0]->span));
+                return;
+            }
             return;
         }
         if (cmd->symbol->identifier->bound->bound_type == BOUND_TYPE_GLOBAL) {

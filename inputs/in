@@ -5,6 +5,7 @@ int c (char x, char e);
 int d (char x, char o);
 
 code c {
+    x= 3.0;
 }
 
 code d {
