@@ -5,6 +5,7 @@
 // +--------------------------------------------------------------------------+
 //
 
+#include "main.h"
 #include "ast.h"
 #include "errorHandler.h"
 #include "lib.h"

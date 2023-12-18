@@ -7,7 +7,7 @@
 // +--------------------------------------------------------------------------+
 //
 
-#include "scannerDefinitions.c"
+#include "src/scannerDefinitions.c"
 %}
 
 

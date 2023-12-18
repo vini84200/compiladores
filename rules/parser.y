@@ -6,10 +6,10 @@
 // +--------------------------------------------------------------------------+
 //
   #include <stdio.h>
-  #include "hash.h"
-  #include "ast.h"
+  #include "../src/hash.h"
+  #include "../src/ast.h"
   #include "y.tab.h"
-  #include "span.h"
+  #include "../src/span.h"
   int yylex (void);
   void yyerror (YYLTYPE *pos, char const *);
 

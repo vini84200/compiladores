@@ -6,7 +6,7 @@
 
 #include "ast.h"
 #include "hash.h"
-#include "y.tab.h"
+#include "../generated/y.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
