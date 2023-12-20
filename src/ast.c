@@ -5,13 +5,15 @@
 #include "ast.h"
 
 
+#include "../generated/y.tab.h"
 #include "errorHandler.h"
 #include "lib.h"
-#include "yyltype.h"
+#include "span.h"
 
 
 #include <stdio.h>
 #include <stdlib.h>
+
 
 FILE *output_file;
 

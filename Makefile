@@ -10,7 +10,7 @@
 .PHONY: clean run echo
 
 LEX = lex
-YACC = bison -d -v
+YACC = bison -d -v -t
 CC = c99 -Wall -std=c99
 NAME = etapa4
 

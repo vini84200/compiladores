@@ -6,6 +6,7 @@
 //
 
 #include "main.h"
+#include "../generated/y.tab.h"
 #include "ast.h"
 #include "errorHandler.h"
 #include "lib.h"
@@ -29,10 +30,11 @@ int main(const int argc, char **argv) {
 
     initSymbolTable();
     printf("Iniciando parser...\n");
+    // yydebug = 1;
     yyparse();
     printf("Leitura concluída com sucesso!\n");
     // hashPrint(getSymbolTable());
-//    astPrintDebug(getAST(), 0);
+    //    astPrintDebug(getAST(), 0);
 
     printf("Iniciando análise semântica...\n");
     SemanticAnalyzerResult *result = analyzeSemantics(getAST());
@@ -44,7 +46,7 @@ int main(const int argc, char **argv) {
 
     printf("Análise semântica concluída com sucesso!\n");
 
-     destroyAST(getAST());
+    destroyAST(getAST());
     setAST(NULL);
 
     return 0;

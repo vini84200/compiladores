@@ -27,4 +27,4 @@ struct YYLTYPE locationSpanning(struct YYLTYPE begin, struct YYLTYPE end);
 void printLocation(struct YYLTYPE location);
 
 
-#endif //SPAN_H
+#endif//SPAN_H

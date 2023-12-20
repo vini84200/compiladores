@@ -8,3 +8,5 @@ y.output
 *.tgz
 etapa3
 etapa4
+build
+generated

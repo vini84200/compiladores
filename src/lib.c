@@ -6,8 +6,8 @@
 //
 
 #include "lib.h"
-#include "../generated/y.tab.h"
 #include "../generated/lex.yy.h"
+#include "../generated/y.tab.h"
 
 
 #include <stdio.h>

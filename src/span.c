@@ -7,6 +7,7 @@
 #include "../generated/y.tab.h"
 #include "ast.h"
 #include "hash.h"
+#include "yyltype.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -82,6 +83,7 @@ Span *spanFromLocation(struct YYLTYPE *location) {
     span->collumn = location->first_column;
     span->end_line = location->last_line;
     span->end_collumn = location->last_column;
+
     return span;
 }
 void printLocation(struct YYLTYPE location) {
