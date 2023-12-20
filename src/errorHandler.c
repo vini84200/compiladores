@@ -106,7 +106,7 @@ void handle_unknown_error(const char *s) {
     fprintf(stderr, "Unknow error\n");
     exit(UNKNOW_ERROR);
 }
-void yyerror(struct YYLTYPE *pos, const char *s) {
+void yyerror(/* struct YYLTYPE *pos, */ const char *s) {
     if (strcmp(s, "syntax error") == 0) {
         handle_syntax_error();
     } else {
