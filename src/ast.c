@@ -7,6 +7,7 @@
 
 #include "errorHandler.h"
 #include "lib.h"
+#include "yyltype.h"
 
 
 #include <stdio.h>
@@ -613,7 +614,6 @@ void destroyAST(AST *node) {
         destroyAST(node->children[3]);
     }
     free(node);
-
 }
 AST *createAST(int type, HashEntry *symbol, AST *child0, AST *child1, AST *child2, AST *child3, struct YYLTYPE location) {
     AST *node = (AST *) calloc(1, sizeof(AST));
@@ -628,7 +628,10 @@ AST *createAST(int type, HashEntry *symbol, AST *child0, AST *child1, AST *child
 }
 
 void astPrintNodeTypes(AST *node) {
-#define PRINT_TYPE(type) case type: printf(#type); break;
+#define PRINT_TYPE(type) \
+    case type:           \
+        printf(#type);   \
+        break;
     switch (node->type) {
         PRINT_TYPE(AST_PROGRAM)
         PRINT_TYPE(AST_DECLARATION_LIST)

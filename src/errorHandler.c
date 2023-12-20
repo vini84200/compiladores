@@ -9,10 +9,12 @@
 //
 
 #include "errorHandler.h"
+#include "../generated/lex.yy.h"
 #include "lib.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 extern int yyleng;
 int handle_wrong_arg_count(void) {
@@ -274,7 +276,7 @@ int printDoubleHighlight(const int column, const int count, const char *ptr_text
         fprintf(stderr, " ");
     }
     fprintf(stderr, "|");
-    for (int i = 0; i < first_count+spaces_between-1; i++) {
+    for (int i = 0; i < first_count + spaces_between - 1; i++) {
         fprintf(stderr, " ");
     }
     fprintf(stderr, "|\n");
@@ -283,10 +285,10 @@ int printDoubleHighlight(const int column, const int count, const char *ptr_text
         fprintf(stderr, " ");
     }
     fprintf(stderr, "|");
-    for (int i = 0; i < first_count+spaces_between-1; i++) {
+    for (int i = 0; i < first_count + spaces_between - 1; i++) {
         fprintf(stderr, " ");
     }
-    fprintf(stderr, "+" );
+    fprintf(stderr, "+");
     for (int i = 0; i < second_count; i++) {
         fprintf(stderr, "-");
     }
@@ -296,12 +298,10 @@ int printDoubleHighlight(const int column, const int count, const char *ptr_text
         fprintf(stderr, " ");
     }
     fprintf(stderr, "+");
-    for (int i = 0; i < first_count+spaces_between+second_count; i++) {
+    for (int i = 0; i < first_count + spaces_between + second_count; i++) {
         fprintf(stderr, "-");
     }
     fprintf(stderr, " %s\n", first_ptr_text);
-
-
 
 
     return 0;

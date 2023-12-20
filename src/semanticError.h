@@ -7,9 +7,8 @@
 
 
 #include "span.h"
+#include "types.h"
 #include <stdbool.h>
-
-typedef enum TypeBase_t TypeBase;
 
 typedef enum SemanticErrorType_t {
     SEMANTIC_ERROR_UNDEF_IDENTIFIER,
@@ -48,7 +47,6 @@ typedef struct SemanticError_t {
     char *secondary_span_text;
 
 
-
     struct SemanticError_t *next;
 } SemanticError;
 
@@ -76,7 +74,7 @@ SemanticError *newWrongOperandTypeSemanticErrorUnary(char *identifier, char *exp
 SemanticError *newAssignTypeMismatchSemanticError(char *identifier, TypeBase expected, TypeBase got, Span *span);
 SemanticError *newIndexNotIntSemanticError(char *identifier, TypeBase got, Span *span);
 SemanticError *newReturnWrongTypeSemanticError(TypeBase expected, TypeBase got, Span *span);
-SemanticError *newWrongArgCountSemanticError(char *func_identifier,int expected, int got, Span *span, Span *original_declaration_span);
+SemanticError *newWrongArgCountSemanticError(char *func_identifier, int expected, int got, Span *span, Span *original_declaration_span);
 SemanticError *newWrongArgTypeSemanticError(char *func_identifier, char *arg_identifier, TypeBase expected, TypeBase got, Span *span);
 SemanticError *newInitializedWithWrongTypeSemanticError(char *identifier, TypeBase expected, TypeBase got, Span *span);
 SemanticError *newArrayInitializedWithTooManyValuesSemanticError(char *identifier, int expected, int got, Span *span);
@@ -98,5 +96,4 @@ SemanticError *semanticErrorIteratorNext(SemanticErrorIterator *iterator);
 bool semanticErrorIteratorDone(SemanticErrorIterator *iterator);
 
 
-
-#endif //SEMANTICERROR_H
+#endif//SEMANTICERROR_H

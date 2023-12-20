@@ -4,9 +4,9 @@
 
 #include "span.h"
 
+#include "../generated/y.tab.h"
 #include "ast.h"
 #include "hash.h"
-#include "../generated/y.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,9 +24,19 @@ Span *newSpan(int line, int column, int end_line, int end_column) {
     span->line = line;
     span->collumn = column;
     span->end_line = end_line;
+    span->end_collumn = end_column;
+    return span;
 }
 Span *newSpanInline(int line, int column, int length) {
+    Span *span = (Span *) malloc(sizeof(Span));
+    span->line = line;
+    span->collumn = column;
+    span->end_line = line;
+    span->end_collumn = column + length;
+
+    return span;
 }
+
 Span *newSpanFromSpan(Span *span) {
     Span *new_span = (Span *) malloc(sizeof(Span));
     memcpy(new_span, span, sizeof(Span));

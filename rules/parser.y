@@ -8,12 +8,18 @@
   #include <stdio.h>
   #include "../src/hash.h"
   #include "../src/ast.h"
+  #include "../src/lib.h"
   #include "y.tab.h"
   #include "../src/span.h"
   int yylex (void);
   void yyerror (YYLTYPE *pos, char const *);
 
 %}
+
+%code requires {
+  #include "../src/hash.h"
+  #include "../src/ast.h"
+}
 
 %union
 {

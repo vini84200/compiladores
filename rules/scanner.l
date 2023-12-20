@@ -8,6 +8,7 @@
 //
 
 #include "src/scannerDefinitions.c"
+#include "src/errorHandler.h"
 %}
 
 

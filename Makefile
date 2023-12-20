@@ -11,7 +11,7 @@
 
 LEX = lex
 YACC = yacc -d -v
-CC = clang -Wall -std=c99
+CC = c99 -Wall -std=c99
 NAME = etapa4
 
 src_files 		:= $(wildcard src/*.c)

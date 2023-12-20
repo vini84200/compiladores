@@ -21,8 +21,7 @@ TypeBase getTypeBaseFromASTType(const struct ast_node *type) {
             return TYPE_BASE_FLOAT;
         case AST_TYPE_CHAR:
             return TYPE_BASE_CHAR;
-        case AST_VALUE:
-        {
+        case AST_VALUE: {
             switch (type->symbol->type) {
                 case SYMBOL_LIT_INT:
                     return TYPE_BASE_INT;
@@ -255,4 +254,5 @@ bool isCompatible(TypeBase expected, TypeBase got) {
         case TYPE_BASE_ERROR:
             return true;
     }
+    return false;
 }

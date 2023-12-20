@@ -18,14 +18,14 @@
 #define MAX_LINE_FOR_REPORT 512
 #include "semanticError.h"
 
-struct YYLTYPE
-{
-    int first_line;
-    int first_column;
-    int last_line;
-    int last_column;
-    unsigned source;
-};
+// struct YYLTYPE
+// {
+//     int first_line;
+//     int first_column;
+//     int last_line;
+//     int last_column;
+//     unsigned source;
+// };
 
 int printLine(const int line_number);
 int printHighlight(const int column, const int count, const char *ptr_text);

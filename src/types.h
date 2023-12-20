@@ -4,8 +4,9 @@
 
 #ifndef TYPES_H
 #define TYPES_H
-#include "semanticError.h"
+// #include "semanticError.h"
 #include "span.h"
+#include <stdbool.h>
 
 typedef enum TypeNature_t {
     TYPE_NATURE_SCALAR,
@@ -75,12 +76,12 @@ typedef struct Identifier_t {
     Type *type;
     Bound *bound;
     Span *declaration_span;
-    struct Identifier_t *next; // Used when the identifier is a parameter that can be declared multiple times
+    struct Identifier_t *next;// Used when the identifier is a parameter that can be declared multiple times
 } Identifier;
 
 Identifier *newIdentifier(char *name, Type *type, Bound *bound, Span *declaration_span);
-SemanticError *setGlobalBound(struct HashEntry_t *symbol, Type *type, Span *declaration_span);
-SemanticError *setParamBound(struct HashEntry_t *symbol, Type *type, struct HashEntry_t *func_symbol, Span *span);
+struct SemanticError_t *setGlobalBound(struct HashEntry_t *symbol, Type *type, Span *declaration_span);
+struct SemanticError_t *setParamBound(struct HashEntry_t *symbol, Type *type, struct HashEntry_t *func_symbol, Span *span);
 
 typedef struct IdentifierIterator_t {
     Identifier *next;
@@ -103,7 +104,6 @@ void destroyParamIterator(ParamIterator *iterator);
 bool paramListContains(ParamTypeList *list, struct HashEntry_t *symbol);
 
 bool isCompatible(TypeBase expected, TypeBase got);
-
 
 
 #endif//TYPES_H
