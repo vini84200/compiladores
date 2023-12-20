@@ -12,7 +12,7 @@
   #include "y.tab.h"
   #include "../src/span.h"
   int yylex (void);
-  void yyerror (YYLTYPE *pos, char const *);
+  void yyerror (/*YYLTYPE *pos,*/ char const *);
 
 %}
 
@@ -64,7 +64,7 @@
 %left '*' '/'
 %left UMINUS
 
-%nonassoc "then"
+%nonassoc then
 %nonassoc KW_ELSE
 
 %type <ast> program list_declare decl decl_var type value decl_array array_init_list decl_func list_param_def param_def param_def_tail list_implementation implementation func_implementation cmd cmd_block list_cmd cmd_attr cmd_attr_array cmd_print cmd_if cmd_if_tail cmd_while cmd_return expr list_expr expr_tail
@@ -181,7 +181,7 @@ expr_tail: ',' expr expr_tail                   { $$ = createASTExprList($2, $3,
 cmd_if: KW_IF '(' expr ')' cmd cmd_if_tail      { $$ = createASTCommandIf($3, $5, $6,@$); }
     ;
 cmd_if_tail: KW_ELSE cmd            { $$ = $2; }
-    | /* empty */   %prec "then"    { $$ = createASTEmptyCommand(@$); }
+    | /* empty */   %prec then    { $$ = createASTEmptyCommand(@$); }
     ;
 
 cmd_while: KW_WHILE '(' expr ')' cmd        { $$ = createASTCommandWhile($3, $5,@$); }
