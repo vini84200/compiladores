@@ -47,8 +47,11 @@ clean:
 generated/y.tab.o: generated/y.tab.c build_folder
 	$(CC) -c generated/y.tab.c -o generated/y.tab.o
 
-generated/y.tab.c generated/y.tab.h: rules/parser.y build_folder
-	$(YACC) rules/parser.y -o generated/y.tab.c
+generated/y.tab.c generated/y.tab.h: rules/parser.y build_folder rules/yaccHeaders.h
+	$(YACC) rules/parser.y -o generated/y.tab.c; \
+	cat rules/yaccHeaders.h | cat - generated/y.tab.h > tmp; \
+	mv tmp generated/y.tab.h
+
 
 generated/lex.yy.o: generated/lex.yy.c   build_folder
 	$(CC) -c lex.yy.c -o generated/lex.yy.o

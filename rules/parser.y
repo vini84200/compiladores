@@ -16,11 +16,6 @@
 
 %}
 
-%code requires {
-  #include "../src/hash.h"
-  #include "../src/ast.h"
-}
-
 %union
 {
   HashEntry *symbol;
