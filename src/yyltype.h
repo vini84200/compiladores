@@ -1,4 +1,0 @@
-#ifndef YYLTYPE_HEADER
-#define YYLTYPE_HEADER
-
-#endif// !YYLTYPE_HEADER
