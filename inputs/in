@@ -1,13 +1,7 @@
-int a ='2';
-float z[2] 1.2 34.2;
+int a = 3;
+int main(int b);
 
-int c (char x, char e);
-int d (char x, char o);
-
-code c {
-    x= 3.0;
+code main {
+    return a + 3 + 34 + (a +b);
 }
 
-code d {
-
-}

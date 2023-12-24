@@ -9,8 +9,10 @@
 #include "../generated/y.tab.h"
 #include "ast.h"
 #include "errorHandler.h"
+#include "generateCode.h"
 #include "lib.h"
 #include "semantics.h"
+#include "tac.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -30,7 +32,7 @@ int main(const int argc, char **argv) {
 
     initSymbolTable();
     printf("Iniciando parser...\n");
-    // yydebug = 1;
+    //     yydebug = 1;
     yyparse();
     printf("Leitura concluída com sucesso!\n");
     // hashPrint(getSymbolTable());
@@ -45,6 +47,12 @@ int main(const int argc, char **argv) {
 
 
     printf("Análise semântica concluída com sucesso!\n");
+
+    TacList *code = generateCode(getAST());
+    printTACList(code);
+
+    printf("Código gerado:\n");
+    printCode(code);
 
     destroyAST(getAST());
     setAST(NULL);

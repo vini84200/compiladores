@@ -6,6 +6,8 @@
 //
 
 #include "hash.h"
+#include "lib.h"
+#include "symbols.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -111,4 +113,10 @@ bool SymbolIteratorDone(SymbolIterator *iterator) {
 }
 void destroySymbolIterator(SymbolIterator *iterator) {
     free(iterator);
+}
+HashEntry *makeTemp() {
+    char *out = calloc(1, 512);
+    static int currentTemp = 0;
+    sprintf(out, "__tmp_comp_var_%d", currentTemp++);
+    return hashInsert(getSymbolTable(), SYMBOL_TEMP_ID, out);
 }

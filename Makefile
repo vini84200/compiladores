@@ -11,7 +11,7 @@
 
 LEX = lex
 YACC = bison -d -v -t
-CC = gcc -Wall -std=c99
+CC = gcc -Wall -std=c99 -g
 NAME = etapa4
 
 src_files 		:= $(wildcard src/*.c)
@@ -48,8 +48,8 @@ generated/y.tab.o: generated/y.tab.c build_folder
 	$(CC) -c generated/y.tab.c -o generated/y.tab.o
 
 generated/y.tab.c generated/y.tab.h: rules/parser.y build_folder rules/yaccHeaders.h
-	$(YACC) rules/parser.y -o generated/y.tab.c; \
-	cat rules/yaccHeaders.h | cat - generated/y.tab.h > tmp; \
+	$(YACC) rules/parser.y -o generated/y.tab.c && \
+	cat rules/yaccHeaders.h | cat - generated/y.tab.h > tmp && \
 	mv tmp generated/y.tab.h
 
 

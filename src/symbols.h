@@ -10,10 +10,11 @@
 #define SYMBOL_LIT_CHAR 3
 #define SYMBOL_LIT_STRING 4
 #define SYMBOL_IDENTIFIER 5
-#define LAST_SYMBOL 5
+#define SYMBOL_TEMP_ID 6
+#define LAST_SYMBOL 6
 
 typedef int SymbolType;
 
 char *getSymbolName(SymbolType type);
 
-#endif //SYMBOLS_H
+#endif//SYMBOLS_H
