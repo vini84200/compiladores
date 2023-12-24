@@ -11,7 +11,7 @@
 
 LEX = lex
 YACC = bison -d -v -t
-CC = c99 -Wall -std=c99 -g
+CC = gcc -Wall -std=c99 -g
 NAME = etapa4
 
 src_files 		:= $(wildcard src/*.c)

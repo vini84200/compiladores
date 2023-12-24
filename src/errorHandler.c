@@ -16,7 +16,6 @@
 #include <string.h>
 
 
-extern int yyleng;
 int handle_wrong_arg_count(void) {
     fprintf(stderr, "call: ./etapa2 input.txt output\n");
     exit(WRONG_ARG_COUNT_ERR);
