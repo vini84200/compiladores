@@ -12,9 +12,69 @@
 struct YYLTYPE;
 #define MAX_CHILDREN 4
 
+typedef enum AST_Type_t {
+    // Structure
+    AST_PROGRAM,
+    AST_DECLARATION_LIST,
+    AST_CODE_LIST,
+    AST_IMPL_FUNC,
+
+    // Definitions
+    AST_VAR_DECLARATION,
+    AST_FUNC_DECLARATION,
+    AST_ARRAY_DECLARATION,
+    AST_ARRAY_VALUES,
+    AST_PARAM_LIST,
+    AST_PARAM,
+
+    // Types
+    AST_TYPE_INT,
+    AST_TYPE_FLOAT,
+    AST_TYPE_CHAR,
+    AST_VALUE,
+
+    // Commnads
+    AST_EMPTY_COMMAND,
+    AST_COMMAND_BLOCK,
+    AST_COMMAND_LIST,
+    AST_COMMAND_ASSIGN,
+    AST_COMMAND_ASSIGN_ARRAY,
+    AST_COMMAND_PRINT_EXPR,
+    AST_COMMAND_PRINT_STRING,
+    AST_COMMAND_IF,
+    AST_COMMAND_WHILE,
+    AST_COMMAND_RETURN,
+
+    // Exprs
+    AST_EXPR_IDENTIFIER,
+    AST_EXPR_ARRAY_GET,
+    AST_EXPR_FUNC_CALL,
+    AST_EXPR_LIST,
+    AST_EXPR_LIT_INT,
+    AST_EXPR_LIT_FLOAT,
+    AST_EXPR_LIT_CHAR,
+    AST_EXPR_ADD,
+    AST_EXPR_SUB,
+    AST_EXPR_MUL,
+    AST_EXPR_DIV,
+    AST_EXPR_LESS,
+    AST_EXPR_GREATER,
+    AST_EXPR_LE,
+    AST_EXPR_GE,
+    AST_EXPR_EQ,
+    AST_EXPR_NE,
+    AST_EXPR_AND,
+    AST_EXPR_OR,
+    AST_EXPR_NOT,
+    AST_EXPR_MINUS,
+    AST_EXPR_READ,
+} AST_Type;
+
+#define AST_TYPE_BASE AST_TYPE_INT
+
 
 typedef struct ast_node {
-    int type;
+    AST_Type type;
     HashEntry *symbol;
     struct ast_node *children[MAX_CHILDREN];
     Span *span;
@@ -32,61 +92,9 @@ void printAST(AST *node, int level);
 #define TYPE_FLOAT 1
 #define TYPE_CHAR 2
 
-#define AST_PROGRAM 0
-#define AST_DECLARATION_LIST 1
-#define AST_VAR_DECLARATION 2
-#define AST_FUNC_DECLARATION 3
-#define AST_ARRAY_DECLARATION 4
-#define AST_ARRAY_VALUES 5
-#define AST_PARAM_LIST 6
-#define AST_PARAM 7
-
-#define AST_TYPE_BASE 8
-#define AST_TYPE_INT AST_TYPE_BASE + TYPE_INT
-#define AST_TYPE_FLOAT AST_TYPE_BASE + TYPE_FLOAT
-#define AST_TYPE_CHAR AST_TYPE_BASE + TYPE_CHAR
-#define AST_VALUE 11
 
 #define AST_NO_MORE_DECLARATION NULL
 #define AST_NO_MORE_PARAM NULL
-
-
-#define AST_CODE_LIST 12
-#define AST_IMPL_FUNC 13
-#define AST_EMPTY_COMMAND 14
-#define AST_COMMAND_BLOCK 15
-#define AST_COMMAND_LIST 16
-#define AST_COMMAND_ASSIGN 17
-#define AST_COMMAND_ASSIGN_ARRAY 18
-#define AST_COMMAND_PRINT_EXPR 19
-#define AST_COMMAND_PRINT_STRING 20
-#define AST_COMMAND_IF 21
-#define AST_COMMAND_WHILE 22
-
-#define AST_EXPR_IDENTIFIER 23
-#define AST_EXPR_ARRAY_GET 24
-#define AST_EXPR_FUNC_CALL 25
-#define AST_EXPR_LIST 26
-#define AST_EXPR_LIT_INT 27
-#define AST_EXPR_LIT_FLOAT 28
-#define AST_EXPR_LIT_CHAR 29
-#define AST_EXPR_ADD 30
-#define AST_EXPR_SUB 31
-#define AST_EXPR_MUL 32
-#define AST_EXPR_DIV 33
-#define AST_EXPR_LESS 34
-#define AST_EXPR_GREATER 35
-#define AST_EXPR_LE 36
-#define AST_EXPR_GE 37
-#define AST_EXPR_EQ 38
-#define AST_EXPR_NE 39
-#define AST_EXPR_AND 40
-#define AST_EXPR_OR 41
-#define AST_EXPR_NOT 42
-#define AST_EXPR_MINUS 43
-#define AST_EXPR_READ 44
-
-#define AST_COMMAND_RETURN 45
 
 
 AST *createASTProgram(AST *declaration_list, AST *code_list, struct YYLTYPE loc);

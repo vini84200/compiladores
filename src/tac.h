@@ -2,9 +2,39 @@
 #define TAC_HEADER
 
 #include "hash.h"
+
+#define TAC_OPT_Gen(F, S) \
+    F(TAC_SYMBOL)         \
+    S F(TAC_MOVE)         \
+    S F(TAC_LABEL)        \
+    S F(TAC_JUMP)         \
+    S F(TAC_ADD)          \
+    S F(TAC_SUB)          \
+    S F(TAC_MUL)          \
+    S F(TAC_DIV)          \
+    S F(TAC_LEQ)          \
+    S F(TAC_LT)           \
+    S F(TAC_EQ)           \
+    S F(TAC_NEQ)          \
+    S F(TAC_GEQ)          \
+    S F(TAC_GT)           \
+    S F(TAC_AND)          \
+    S F(TAC_OR)           \
+    S F(TAC_NOT)          \
+    S F(TAC_IFZ)          \
+    S F(TAC_BEGFUN)       \
+    S F(TAC_ENDFUN)       \
+    S F(TAC_ARG)          \
+    S F(TAC_CALL)         \
+    S F(TAC_RET)          \
+    S F(TAC_PRINT)        \
+    S F(TAC_READ)
+
+#define COMMA ,
+#define ID(x) x
+
 typedef enum TacOp_t {
-    TAC_SYMBOL,
-    TAC_ADD
+    TAC_OPT_Gen(ID, COMMA)
 } TacOp;
 
 #define TAC_SRC_NUMBER 2

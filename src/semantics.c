@@ -766,6 +766,9 @@ TypeBase getExpressionType(struct ast_node *expr, ParamTypeList *pList) {
             // READ( $0=type )
             // The type is the declared type in the read command
             return getTypeBaseFromASTType(expr->children[0]);
+        default:
+            // This is not and EXPR
+            criticalError("Unknown Expr cannot get type");
     }
     criticalError("Invalid expression type");
 }

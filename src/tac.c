@@ -113,6 +113,7 @@ bool TacFIterDone(TacIterator *iter) {
 bool TacFIterFirst(TacIterator *iter) {
     return (iter->current->prev == NULL);
 }
+#define EMPTY
 
 void printTACList(TacList *list) {
     TacIterator iter = createTacForwardIterator(list);
@@ -124,10 +125,8 @@ void printTACList(TacList *list) {
     case A:         \
         printf(#A); \
         break;
-
         switch (t->op) {
-            PTAC(TAC_SYMBOL)
-            PTAC(TAC_ADD)
+            TAC_OPT_Gen(PTAC, EMPTY)
         }
         if (t->dst != NULL) {
             printf("  dst: %s", t->dst ? t->dst->value : "0");
@@ -154,10 +153,7 @@ void printCode(TacList *list) {
         break;
 
         switch (t->op) {
-            case TAC_SYMBOL:
-                break;
-
-                PTAC(TAC_ADD)
+            TAC_OPT_Gen(PTAC, EMPTY)
         }
         printf("  dst: %s", t->dst ? t->dst->value : "0");
         for (int i = 0; i < TAC_SRC_NUMBER; i++) {
