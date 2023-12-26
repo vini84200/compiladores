@@ -117,6 +117,6 @@ void destroySymbolIterator(SymbolIterator *iterator) {
 HashEntry *makeTemp() {
     char *out = calloc(1, 512);
     static int currentTemp = 0;
-    sprintf(out, "__tmp_comp_var_%d", currentTemp++);
+    sprintf(out, "__tmp_%d_", currentTemp++);
     return hashInsert(getSymbolTable(), SYMBOL_TEMP_ID, out);
 }

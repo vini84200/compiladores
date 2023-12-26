@@ -9,19 +9,24 @@
 
 HashEntry *getListDst(TacList *list) {
     if (list == NULL) {
-        fprintf(stderr, "WARN: no list in getListDst()");
+        WARN("no list in getListDst()");
         return 0;
     }
     if (list->last == NULL) {
-        fprintf(stderr, "WARN: no last in get List Dst");
+        WARN("no last in get List Dst");
         return 0;
     }
     return list->last->tac.dst;
 }
 
-TacList *generateCodeExpr(TacList *code, AST_Type type, TacList *childLists[]) {
+TacList *generateCodeExpr(TacList *code, AST *ast, TacList *childLists[]) {
+    AST_Type type = ast->type;
     switch (type) {
         case AST_EXPR_LIST:
+            appendTacList(code, createTac(
+                                        TAC_ARG,
+                                        NULL,
+                                        getListDst(childLists[0]), NULL));
             break;
         case AST_EXPR_ADD:
             appendTacList(code, createTac(
@@ -122,8 +127,15 @@ TacList *generateCodeExpr(TacList *code, AST_Type type, TacList *childLists[]) {
         } break;
 
         case AST_EXPR_ARRAY_GET:
-
+            break;
         case AST_EXPR_FUNC_CALL:
+            appendTacList(code, createTac(
+                                        TAC_CALL,
+                                        makeTemp(),
+                                        ast->symbol,
+                                        NULL));
+            break;
+
         case AST_EXPR_READ:
             appendTacList(code, createTac(
                                         TAC_READ,
@@ -133,12 +145,13 @@ TacList *generateCodeExpr(TacList *code, AST_Type type, TacList *childLists[]) {
             break;
 
         default:
-            printf("WARN: Unknown Expr Types");
+            WARN("Unknown Expr Types");
     }
     return code;
 }
 
-TacList *generateCodeCmds(TacList *code, AST_Type type, TacList *childLists[]) {
+TacList *generateCodeCmds(TacList *code, AST *ast, TacList *childLists[]) {
+    AST_Type type = ast->type;
     switch (type) {
         case AST_COMMAND_RETURN:
             appendTacList(code, createTac(
@@ -147,8 +160,15 @@ TacList *generateCodeCmds(TacList *code, AST_Type type, TacList *childLists[]) {
                                         getListDst(childLists[0]),
                                         NULL));
             break;
+        case AST_COMMAND_ASSIGN:
+            appendTacList(code, createTac(
+                                        TAC_MOVE,
+                                        ast->symbol,
+                                        getListDst(childLists[0]),
+                                        NULL));
+            break;
         default:
-            printf("WARN: Unknown Cmd Types");
+            WARN("Unknown command type %d", type);
     }
     return code;
 }
@@ -188,7 +208,7 @@ TacList *generateCode(AST *ast) {
         case AST_EXPR_NOT:
         case AST_EXPR_MINUS:
         case AST_EXPR_READ:
-            generateCodeExpr(list, ast->type, childLists);
+            generateCodeExpr(list, ast, childLists);
             break;
         case AST_EMPTY_COMMAND:
         case AST_COMMAND_BLOCK:
@@ -202,7 +222,7 @@ TacList *generateCode(AST *ast) {
         case AST_COMMAND_PRINT_STRING:
         case AST_COMMAND_IF:
         case AST_COMMAND_WHILE:
-            generateCodeCmds(list, ast->type, childLists);
+            generateCodeCmds(list, ast, childLists);
             break;
 
         case AST_TYPE_INT:
@@ -214,9 +234,35 @@ TacList *generateCode(AST *ast) {
         case AST_PROGRAM:
         case AST_DECLARATION_LIST:
         case AST_CODE_LIST:
-        case AST_IMPL_FUNC:
             // Nothing
             break;
+        case AST_IMPL_FUNC: {
+            // Prefixes and sufixes with function ideas
+            TacList *prefix = createTacList();
+            TacList *suffix = createTacList();
+            // PREFIX
+            appendTacList(prefix, createTac(
+                                          TAC_LABEL,
+                                          NULL,
+                                          ast->symbol, NULL));
+            appendTacList(prefix, createTac(
+                                          TAC_BEGFUN,
+                                          NULL,
+                                          ast->symbol, NULL));
+            // SUFIX
+            appendTacList(suffix, createTac(
+                                          TAC_ENDFUN,
+                                          NULL,
+                                          ast->symbol, NULL));
+
+            for (int i = 0; i < MAX_CHILDREN; i++) {
+                list = joinTacList(childLists[i], list);
+            }
+            list = joinTacList(prefix, list);
+            list = joinTacList(list, suffix);
+
+            return list;
+        } break;
 
         case AST_VAR_DECLARATION:
         case AST_FUNC_DECLARATION:
@@ -229,7 +275,7 @@ TacList *generateCode(AST *ast) {
         default:
             criticalError("Unknown AST Type");
     }
-    for (int i = 0; i < MAX_CHILDREN; i++) {
+    for (int i = MAX_CHILDREN - 1; i >= 0; i--) {
         list = joinTacList(childLists[i], list);
     }
 

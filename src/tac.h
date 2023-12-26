@@ -34,7 +34,8 @@
 #define ID(x) x
 
 typedef enum TacOp_t {
-    TAC_OPT_Gen(ID, COMMA)
+    TAC_OPT_Gen(ID, COMMA),
+    TAC_MAX
 } TacOp;
 
 #define TAC_SRC_NUMBER 2

@@ -11,6 +11,7 @@
 #include "errorHandler.h"
 #include "generateCode.h"
 #include "lib.h"
+#include "logs.h"
 #include "semantics.h"
 #include "tac.h"
 #include <stdio.h>
@@ -31,14 +32,14 @@ int main(const int argc, char **argv) {
     // open_output_file(argv[2]);
 
     initSymbolTable();
-    printf("Iniciando parser...\n");
+    INFO("Iniciando parser...");
     //     yydebug = 1;
     yyparse();
-    printf("Leitura concluída com sucesso!\n");
+    INFO("Leitura concluída com sucesso!");
     // hashPrint(getSymbolTable());
     //    astPrintDebug(getAST(), 0);
 
-    printf("Iniciando análise semântica...\n");
+    INFO("Iniciando análise semântica...");
     SemanticAnalyzerResult *result = analyzeSemantics(getAST());
     if (result->error_list->first != NULL) {
         handle_semantic_errors(result->error_list);
@@ -46,13 +47,15 @@ int main(const int argc, char **argv) {
     destroySemanticAnalyzerResult(result);
 
 
-    printf("Análise semântica concluída com sucesso!\n");
+    INFO("Análise semântica concluída com sucesso!");
 
+    INFO("Iniciando geração de codigo intermediario")
     TacList *code = generateCode(getAST());
     printTACList(code);
 
-    printf("Código gerado:\n");
+    DEBUG("Código gerado:\n");
     printCode(code);
+
 
     destroyAST(getAST());
     setAST(NULL);

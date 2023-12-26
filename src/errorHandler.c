@@ -17,11 +17,11 @@
 
 
 int handle_wrong_arg_count(void) {
-    fprintf(stderr, "call: ./etapa2 input.txt output\n");
+    CRITICAL("call: ./etapa2 input.txt output\n");
     exit(WRONG_ARG_COUNT_ERR);
 }
 int handle_cannot_open_file(char *argv) {
-    fprintf(stderr, "[ERROR] Cannot open file %s... \n", argv);
+    CRITICAL("Cannot open file %s... \n", argv);
     exit(CANNOT_OPEN_FILE_ERR);
 }
 
@@ -89,19 +89,19 @@ void handle_semantic_errors(SemanticErrorList *error_list) {
     SemanticErrorIterator *iterator = newSemanticErrorIterator(error_list);
     while (!semanticErrorIteratorDone(iterator)) {
         SemanticError *error = semanticErrorIteratorNext(iterator);
-        fprintf(stderr, "[ERROR] %s at %d:%d\n", error->message, error->span->line, error->span->collumn);
+        fprintf(stderr, BOLD_RED "[ERROR]  %s at %d:%d\n" C_RESET, error->message, error->span->line, error->span->collumn);
         semantic_error_print_spans(error);
     }
     exit(SEMANTIC_ERROR_ERR);
 }
 int handleUnrecognizedToken(char token, int line) {
-    fprintf(stderr, "[ERROR] Token '%c' not recognized at %d:%d\n", token, line, getCollumn());
+    fprintf(stderr, BOLD_RED "[ERROR] Token '%c' not recognized at %d:%d\n" C_RESET, token, line, getCollumn());
     printLineErrWithPtr(line, getCollumn(), "Unrecognized token");
     exit(SYNTAX_ERROR_ERR);
 }
 
 void handle_unknown_error(const char *s) {
-    fprintf(stderr, "[ERROR] Line %d: %s\n", getLineNumber(), s);
+    fprintf(stderr, BOLD_RED "[ERROR] Line %d: %s\n" C_RESET, getLineNumber(), s);
     fprintf(stderr, "Unknow error\n");
     exit(UNKNOW_ERROR);
 }
@@ -209,14 +209,14 @@ int printLineErrWithHighlight(const int line_number, const int ch, const int cou
         return 1;
     }
 }
-void criticalError(const char *message) {
-    fprintf(stderr, "[ERROR] %s\n", message);
-    exit(UNKNOW_ERROR);
-}
+// void criticalError(const char *message) {
+//     fprintf(stderr, "[ERROR] %s\n", message);
+//     exit(UNKNOW_ERROR);
+// }
 
 void handle_syntax_error() {
     // Print the line where the error occurred
-    fprintf(stderr, "[ERROR] Syntax error at line %d\n", getLineNumber());
+    fprintf(stderr, BOLD_RED "[ERROR] Syntax error at line %d\n" C_RESET, getLineNumber());
 
     // Read the line where the error occurred
     // printLineErr(getLineNumber());

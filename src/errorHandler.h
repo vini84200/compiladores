@@ -16,7 +16,9 @@
 #define UNKNOW_ERROR 255
 
 #define MAX_LINE_FOR_REPORT 512
+#include "logs.h"
 #include "semanticError.h"
+#include <stdlib.h>
 
 // struct YYLTYPE
 // {
@@ -40,6 +42,9 @@ int printLineErr(const int line_number);
 int printLineErrWithPtr(const int line_number, const int ch, const char *ptr_text);
 int printLineErrWithHighlight(const int line_number, const int ch, const int count, const char *ptr_text);
 
-_Noreturn void criticalError(const char *message);
+// _Noreturn void criticalError(const char *message);
+#define criticalError(MESSAGE, args...) \
+    CRITICAL(MESSAGE, ##args);          \
+    exit(-1);
 
 #endif//ETAPA2_ERRORHANDLER_H

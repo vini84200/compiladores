@@ -1,6 +1,13 @@
 #include "tac.h"
+#include "errorHandler.h"
+#include "logs.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#define X(ID) [ID] = #ID
+#define COMMA ,
+static const char *TacToString[TAC_MAX] = {
+        TAC_OPT_Gen(X, COMMA)};
 
 Tac createTac(TacOp op, HashEntry *dst, HashEntry *src1, HashEntry *src2) {
     Tac t = {
@@ -126,7 +133,9 @@ void printTACList(TacList *list) {
         printf(#A); \
         break;
         switch (t->op) {
-            TAC_OPT_Gen(PTAC, EMPTY)
+            TAC_OPT_Gen(PTAC, EMPTY);
+            case TAC_MAX:
+                criticalError("Should not instanciate TAC_MAX");
         }
         if (t->dst != NULL) {
             printf("  dst: %s", t->dst ? t->dst->value : "0");
@@ -139,26 +148,19 @@ void printTACList(TacList *list) {
 }
 
 void printCode(TacList *list) {
+    INFO("Printing generated intermidiate code");
     TacIterator iter = createTacForwardIterator(list);
     while (!TacFIterDone(&iter)) {
         Tac *t = TacFIterNext(&iter);
         if (t->op == TAC_SYMBOL) {
             continue;
         }
-        printf("(");
-
-#define PTAC(A)     \
-    case A:         \
-        printf(#A); \
-        break;
-
-        switch (t->op) {
-            TAC_OPT_Gen(PTAC, EMPTY)
-        }
-        printf("  dst: %s", t->dst ? t->dst->value : "0");
-        for (int i = 0; i < TAC_SRC_NUMBER; i++) {
-            printf("  src%X : %s", i + 10, t->src[i] ? t->src[i]->value : "0");
-        }
-        printf(")\n");
+        printf("(%-14s dst:%-10s srcA:%-10s srcB:%-10s)\n",
+               TacToString[t->op],
+               t->dst ? t->dst->value : "0",
+               t->src[0] ? t->src[0]->value : "0",
+               t->src[1] ? t->src[1]->value : "0");
+        if (t->op == TAC_ENDFUN)
+            printf("\n");
     }
 }
