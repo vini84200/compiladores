@@ -127,6 +127,7 @@ TacList *generateCodeExpr(TacList *code, AST *ast, TacList *childLists[]) {
         } break;
 
         case AST_EXPR_ARRAY_GET:
+            // TODO: Implement code generation for array get
             break;
         case AST_EXPR_FUNC_CALL:
             appendTacList(code, createTac(
@@ -164,6 +165,84 @@ TacList *generateCodeCmds(TacList *code, AST *ast, TacList *childLists[]) {
             appendTacList(code, createTac(
                                         TAC_MOVE,
                                         ast->symbol,
+                                        getListDst(childLists[0]),
+                                        NULL));
+            break;
+        case AST_COMMAND_ASSIGN_ARRAY:
+            // TODO: Implement code generation for array assignment
+            break;
+        case AST_COMMAND_IF: {
+            // (AST_IF sym:NULL [0]: expr [1]: cmd then [2]: cmd else)
+            // Generate:
+            // r = [EXPR]
+            // ifz r b
+            // [THEN]
+            // jmp end
+            // b:
+            // [ELSE]
+            // end:
+
+            TacList *expr = childLists[0];
+            HashEntry *res = getListDst(expr);
+            HashEntry *elseLabel = makeTemp();
+            HashEntry *endLabel = makeTemp();
+
+            TacList *then = childLists[1];
+            TacList *_else = childLists[2];
+
+            code = joinTacList(code, expr);
+            appendTacList(code, createTac(
+                                        TAC_IFZ,
+                                        NULL,
+                                        res,
+                                        elseLabel));
+            code = joinTacList(code, then);
+            appendTacList(code, createTac(TAC_JUMP, NULL, endLabel, NULL));
+            appendTacList(code, createTac(TAC_LABEL, NULL, elseLabel, NULL));
+            code = joinTacList(code, _else);
+            appendTacList(code, createTac(TAC_LABEL, NULL, endLabel, NULL));
+
+            break;
+        }
+        case AST_COMMAND_WHILE: {
+            // (AST_WHILE sym: NULL [0]: expr [1]: repeating cmd)
+            // Generates:
+            // repeat:
+            // r = [expr]
+            // ifz r end
+            // [REPEATING CMD]
+            // jmp repeat
+            // end:
+
+            TacList *expr = childLists[0];
+            HashEntry *res = getListDst(expr);
+            HashEntry *repeatLabel = makeTemp();
+            HashEntry *endLabel = makeTemp();
+            TacList *then = childLists[1];
+
+            appendTacList(code, createTac(TAC_LABEL, NULL, repeatLabel, NULL));
+            code = joinTacList(code, expr);
+            appendTacList(code, createTac(
+                                        TAC_IFZ,
+                                        NULL,
+                                        res,
+                                        endLabel));
+            code = joinTacList(code, then);
+            appendTacList(code, createTac(TAC_JUMP, NULL, repeatLabel, NULL));
+            appendTacList(code, createTac(TAC_LABEL, NULL, endLabel, NULL));
+            break;
+        }
+        case AST_COMMAND_PRINT_STRING:
+            appendTacList(code, createTac(
+                                        TAC_PRINT,
+                                        NULL,
+                                        ast->symbol,
+                                        NULL));
+            break;
+        case AST_COMMAND_PRINT_EXPR:
+            appendTacList(code, createTac(
+                                        TAC_PRINT,
+                                        NULL,
                                         getListDst(childLists[0]),
                                         NULL));
             break;
@@ -208,7 +287,7 @@ TacList *generateCode(AST *ast) {
         case AST_EXPR_NOT:
         case AST_EXPR_MINUS:
         case AST_EXPR_READ:
-            generateCodeExpr(list, ast, childLists);
+            list = generateCodeExpr(list, ast, childLists);
             break;
         case AST_EMPTY_COMMAND:
         case AST_COMMAND_BLOCK:
@@ -222,7 +301,7 @@ TacList *generateCode(AST *ast) {
         case AST_COMMAND_PRINT_STRING:
         case AST_COMMAND_IF:
         case AST_COMMAND_WHILE:
-            generateCodeCmds(list, ast, childLists);
+            list = generateCodeCmds(list, ast, childLists);
             break;
 
         case AST_TYPE_INT:
@@ -275,6 +354,18 @@ TacList *generateCode(AST *ast) {
         default:
             criticalError("Unknown AST Type");
     }
+    if (ast->type == AST_COMMAND_IF) {
+        // Ifs are handled in generateCodeCmds and
+        // have their own code generation logic
+        return list;
+    }
+    if (ast->type == AST_COMMAND_WHILE) {
+        // While are handled in generateCodeCmds and
+        // have their own code generation logic
+        return list;
+    }
+
+
     for (int i = MAX_CHILDREN - 1; i >= 0; i--) {
         list = joinTacList(childLists[i], list);
     }

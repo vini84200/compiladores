@@ -4,19 +4,20 @@ int fun();
 int outra(int x, int y);
 
 code main {
-    a = 32;
-    a = fun();
-    return a + b - 100;
+    a = input(int);
+    while(a > (2 + 3)) {
+        print "Ok";
+        a = outra(a, -2);
+    }
+
+    return 34;
 }
 
 code fun {
-    a = outra(123, 2);
-    return 12;
 }
 
 code outra 
 {
-    a = 1;
-    return 2 - 90;
+    return x + y;
 }
 

@@ -126,24 +126,13 @@ void printTACList(TacList *list) {
     TacIterator iter = createTacForwardIterator(list);
     while (!TacFIterDone(&iter)) {
         Tac *t = TacFIterNext(&iter);
-        printf("(");
-
-#define PTAC(A)     \
-    case A:         \
-        printf(#A); \
-        break;
-        switch (t->op) {
-            TAC_OPT_Gen(PTAC, EMPTY);
-            case TAC_MAX:
-                criticalError("Should not instanciate TAC_MAX");
-        }
-        if (t->dst != NULL) {
-            printf("  dst: %s", t->dst ? t->dst->value : "0");
-        }
-        for (int i = 0; i < TAC_SRC_NUMBER; i++) {
-            printf("  src %d: %s", i, t->src[i] ? t->src[i]->value : "0");
-        }
-        printf(")\n");
+        printf("(%-14s dst:%-10s srcA:%-10s srcB:%-10s)\n",
+               TacToString[t->op],
+               t->dst ? t->dst->value : "0",
+               t->src[0] ? t->src[0]->value : "0",
+               t->src[1] ? t->src[1]->value : "0");
+        if (t->op == TAC_ENDFUN)
+            printf("\n");
     }
 }
 
@@ -155,7 +144,12 @@ void printCode(TacList *list) {
         if (t->op == TAC_SYMBOL) {
             continue;
         }
-        printf("(%-14s dst:%-10s srcA:%-10s srcB:%-10s)\n",
+        if (t->op == TAC_LABEL) {
+            if (!t->src[0]) ERROR("Invalid label");
+            printf("%s:\n", t->src[0]->value);
+            continue;
+        }
+        printf("(%-14s %-10s A:%-10s B:%-10s)\n",
                TacToString[t->op],
                t->dst ? t->dst->value : "0",
                t->src[0] ? t->src[0]->value : "0",

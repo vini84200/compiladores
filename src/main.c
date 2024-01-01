@@ -23,6 +23,7 @@ int yyparse();
 
 
 int main(const int argc, char **argv) {
+    initLogs();
     if (argc < 2) {
         return handle_wrong_arg_count();
     }

@@ -39,10 +39,11 @@ static const char *logLevelString[L_MAX_LEVELS] = {
 
 
 extern LogLevel minLevel;
+extern FILE* logsFile;
 
 #define LOG_(LEVEL, FORMAT, args...)                                                                     \
     if (LEVEL >= minLevel) {                                                                             \
-        fprintf(stderr, "%8s(%2u) %s: " FORMAT "\n", __FILE__, __LINE__, logLevelString[LEVEL], ##args); \
+        fprintf(logsFile, "%8s(%2u) %s: " FORMAT "\n", __FILE__, __LINE__, logLevelString[LEVEL], ##args); \
     }
 
 #define DEBUG(FORMAT, args...) LOG_(L_DEBUG, FORMAT, ##args)
@@ -50,5 +51,9 @@ extern LogLevel minLevel;
 #define WARN(FORMAT, args...) LOG_(L_WARN, FORMAT, ##args)
 #define ERROR(FORMAT, args...) LOG_(L_ERROR, FORMAT, ##args)
 #define CRITICAL(FORMAT, args...) LOG_(L_CRITICA, FORMAT, ##args)
+
+void setLogLevel(LogLevel level);
+void setLogsFile(FILE *file);
+void initLogs();
 
 #endif// !LOGS_HEADER
