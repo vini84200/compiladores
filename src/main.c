@@ -30,15 +30,11 @@ int main(const int argc, char **argv) {
     if (0 == (yyin = fopen(argv[1], "r"))) {
         return handle_cannot_open_file(argv[1]);
     }
-    // open_output_file(argv[2]);
 
     initSymbolTable();
     INFO("Iniciando parser...");
-    //     yydebug = 1;
     yyparse();
     INFO("Leitura concluída com sucesso!");
-    // hashPrint(getSymbolTable());
-    //    astPrintDebug(getAST(), 0);
 
     INFO("Iniciando análise semântica...");
     SemanticAnalyzerResult *result = analyzeSemantics(getAST());
@@ -52,7 +48,8 @@ int main(const int argc, char **argv) {
 
     INFO("Iniciando geração de codigo intermediario")
     TacList *code = generateCode(getAST());
-    printTACList(code);
+    // printTACList(code);
+    INFO("Código gerado com sucesso")
 
     DEBUG("Código gerado:\n");
     printCode(code);

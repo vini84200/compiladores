@@ -127,7 +127,11 @@ TacList *generateCodeExpr(TacList *code, AST *ast, TacList *childLists[]) {
         } break;
 
         case AST_EXPR_ARRAY_GET:
-            // TODO: Implement code generation for array get
+            appendTacList(code, createTac(
+                                        TAC_LOAD_ARRAY,
+                                        makeTemp(),
+                                        ast->symbol,
+                                        getListDst(childLists[0])));
             break;
         case AST_EXPR_FUNC_CALL:
             appendTacList(code, createTac(
@@ -169,7 +173,11 @@ TacList *generateCodeCmds(TacList *code, AST *ast, TacList *childLists[]) {
                                         NULL));
             break;
         case AST_COMMAND_ASSIGN_ARRAY:
-            // TODO: Implement code generation for array assignment
+            appendTacList(code, createTac(
+                                        TAC_MOVE_ARRAY,
+                                        ast->symbol,
+                                        getListDst(childLists[0]),
+                                        getListDst(childLists[1])));
             break;
         case AST_COMMAND_IF: {
             // (AST_IF sym:NULL [0]: expr [1]: cmd then [2]: cmd else)
@@ -185,7 +193,9 @@ TacList *generateCodeCmds(TacList *code, AST *ast, TacList *childLists[]) {
             TacList *expr = childLists[0];
             HashEntry *res = getListDst(expr);
             HashEntry *elseLabel = makeTemp();
+            elseLabel->type = SYMBOL_LABEL;
             HashEntry *endLabel = makeTemp();
+            endLabel->type = SYMBOL_LABEL;
 
             TacList *then = childLists[1];
             TacList *_else = childLists[2];
@@ -217,7 +227,9 @@ TacList *generateCodeCmds(TacList *code, AST *ast, TacList *childLists[]) {
             TacList *expr = childLists[0];
             HashEntry *res = getListDst(expr);
             HashEntry *repeatLabel = makeTemp();
+            repeatLabel->type = SYMBOL_LABEL;
             HashEntry *endLabel = makeTemp();
+            endLabel->type = SYMBOL_LABEL;
             TacList *then = childLists[1];
 
             appendTacList(code, createTac(TAC_LABEL, NULL, repeatLabel, NULL));

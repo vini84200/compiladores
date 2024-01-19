@@ -28,7 +28,9 @@
     S F(TAC_CALL)         \
     S F(TAC_RET)          \
     S F(TAC_PRINT)        \
-    S F(TAC_READ)
+    S F(TAC_READ)         \
+    S F(TAC_MOVE_ARRAY)   \
+    S F(TAC_LOAD_ARRAY)
 
 #define COMMA ,
 #define ID(x) x

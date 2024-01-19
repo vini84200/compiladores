@@ -12,7 +12,7 @@
 LEX = lex
 YACC = bison -d -v -t
 CC = gcc -Wall -std=c99 -g
-NAME = etapa4
+NAME = etapa5
 
 src_files 		:= $(wildcard src/*.c)
 header_files 	:= $(wildcard src/*.h)

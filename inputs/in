@@ -1,4 +1,5 @@
 int a = 3;
+int array[10] 2 3 4 5 6 7 8 9 10 11;
 int main(int b);
 int fun();
 int outra(int x, int y);
@@ -10,10 +11,17 @@ code main {
         a = outra(a, -2);
     }
 
+    a = fun();
     return 34;
 }
 
 code fun {
+    array[0] = 9;
+    while (array[0] > 0) {
+        print "Ok";
+        array[0] = array[0] - 1;
+        array[array[0]] = array[0];
+    }
 }
 
 code outra 

@@ -28,7 +28,12 @@ TacList *createTacList() {
     return tl;
 }
 void destroyTacList(TacList *tacList) {
-    // TODO: Iterate through all TACs and delete them
+    TacListItem *item = tacList->head;
+    while (item != NULL) {
+        TacListItem *next = item->next;
+        free(item);
+        item = next;
+    }
 
     free(tacList);
 }

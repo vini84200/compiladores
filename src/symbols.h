@@ -11,7 +11,9 @@
 #define SYMBOL_LIT_STRING 4
 #define SYMBOL_IDENTIFIER 5
 #define SYMBOL_TEMP_ID 6
-#define LAST_SYMBOL 6
+#define SYMBOL_LABEL 7
+#define LAST_SYMBOL 7
+
 
 typedef int SymbolType;
 

@@ -17,7 +17,7 @@
 
 
 int handle_wrong_arg_count(void) {
-    CRITICAL("call: ./etapa2 input.txt output\n");
+    CRITICAL("call: ./etapa5 input.txt \n");
     exit(WRONG_ARG_COUNT_ERR);
 }
 int handle_cannot_open_file(char *argv) {
