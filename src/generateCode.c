@@ -320,11 +320,10 @@ TacList *generateCode(AST *ast) {
         case AST_TYPE_FLOAT:
         case AST_TYPE_CHAR:
         case AST_VALUE:
-            // Nothing
-            break;
         case AST_PROGRAM:
         case AST_DECLARATION_LIST:
         case AST_CODE_LIST:
+            // Nothing, as these are not used in code generation
             // Nothing
             break;
         case AST_IMPL_FUNC: {

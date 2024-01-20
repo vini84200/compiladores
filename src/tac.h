@@ -2,6 +2,7 @@
 #define TAC_HEADER
 
 #include "hash.h"
+#include <bits/types/FILE.h>
 
 #define TAC_OPT_Gen(F, S) \
     F(TAC_SYMBOL)         \
@@ -85,7 +86,7 @@ bool TacFIterDone(TacIterator *iter);
 bool TacFIterFirst(TacIterator *iter);
 
 void printTACList(TacList *list);
-void printCode(TacList *list);
+void printCode(TacList *list, FILE *fileOut);
 
 
 #endif// !TAC_HEADER

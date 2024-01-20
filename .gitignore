@@ -8,7 +8,11 @@ y.output
 *.tgz
 etapa3
 etapa4
+etapa5
+etapa6
+etapa7
 build
 generated
 .idea
+out
 

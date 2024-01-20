@@ -8,7 +8,6 @@
 # UFRGS - Compiladores B - Marcelo Johann - 2009/2 - Etapa 1
 
 .PHONY: clean run echo
-
 LEX = lex
 YACC = bison -d -v -t
 CC = gcc -Wall -std=c99 -g

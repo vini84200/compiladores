@@ -141,8 +141,8 @@ void printTACList(TacList *list) {
     }
 }
 
-void printCode(TacList *list) {
-    INFO("Printing generated intermidiate code");
+void printCode(TacList *list, FILE *fileOut) {
+    INFO("Printing generated intermediate code");
     TacIterator iter = createTacForwardIterator(list);
     while (!TacFIterDone(&iter)) {
         Tac *t = TacFIterNext(&iter);
@@ -151,15 +151,15 @@ void printCode(TacList *list) {
         }
         if (t->op == TAC_LABEL) {
             if (!t->src[0]) ERROR("Invalid label");
-            printf("%s:\n", t->src[0]->value);
+            fprintf(fileOut, "%s:\n", t->src[0]->value);
             continue;
         }
-        printf("(%-14s %-10s A:%-10s B:%-10s)\n",
-               TacToString[t->op],
-               t->dst ? t->dst->value : "0",
-               t->src[0] ? t->src[0]->value : "0",
-               t->src[1] ? t->src[1]->value : "0");
+        fprintf(fileOut, "(%-14s %-10s A:%-10s B:%-10s)\n",
+                TacToString[t->op],
+                t->dst ? t->dst->value : "0",
+                t->src[0] ? t->src[0]->value : "0",
+                t->src[1] ? t->src[1]->value : "0");
         if (t->op == TAC_ENDFUN)
-            printf("\n");
+            fprintf(fileOut, "\n");
     }
 }
