@@ -5,6 +5,10 @@
 // +--------------------------------------------------------------------------+
 //
 
+#include <stdbool.h>
+bool debug = false;
+#define DEBUG_GLOBAL_DEF
+
 #include "lib.h"
 #include "../generated/lex.yy.h"
 #include "../generated/y.tab.h"
@@ -55,3 +59,4 @@ void user_action() {
 #endif /* ifdef DEBUG
      */
 }
+

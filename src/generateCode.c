@@ -19,6 +19,9 @@ HashEntry *getListDst(TacList *list) {
     return list->last->tac.dst;
 }
 
+// TODO: Adicionar comentários
+// TODO: Adicionar anotações do uso e liberação dos temporários
+
 TacList *generateCodeExpr(TacList *code, AST *ast, TacList *childLists[]) {
     AST_Type type = ast->type;
     switch (type) {
@@ -134,6 +137,24 @@ TacList *generateCodeExpr(TacList *code, AST *ast, TacList *childLists[]) {
                                         getListDst(childLists[0])));
             break;
         case AST_EXPR_FUNC_CALL:
+            // AST_EXPR_FUNC_CALL (sym: func_name [0]: arg_list)
+            // func(a, b) should generate:
+            // WILL_CALL func
+            // MOVE tmp_1 b
+            // ARGS tmp_1
+            // CONSUMED_TEMP tmp_1
+            // MOVE tmp_2 a
+            // ARGS tmp_2
+            // CONSUMED_TEMP tmp_2
+            // CALL func
+
+            appendTacList(code, createTac(
+                                        TAC_WILL_CALL,
+                                        NULL,
+                                        ast->symbol,
+                                        NULL));
+            code = joinTacList(code, childLists[0]);
+
             appendTacList(code, createTac(
                                         TAC_CALL,
                                         makeTemp(),
@@ -360,7 +381,6 @@ TacList *generateCode(AST *ast) {
         case AST_ARRAY_VALUES:
         case AST_PARAM_LIST:
         case AST_PARAM:
-            // TODO
             break;
         default:
             criticalError("Unknown AST Type");
@@ -372,6 +392,11 @@ TacList *generateCode(AST *ast) {
     }
     if (ast->type == AST_COMMAND_WHILE) {
         // While are handled in generateCodeCmds and
+        // have their own code generation logic
+        return list;
+    }
+    if (ast->type == AST_EXPR_FUNC_CALL) {
+        // Functions are handled in generateCodeCmds and
         // have their own code generation logic
         return list;
     }

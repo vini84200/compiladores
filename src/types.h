@@ -25,7 +25,7 @@ typedef enum TypeBase_t {
 
 struct ast_node;
 TypeBase getTypeBaseFromASTType(const struct ast_node *type);
-
+char *getTypeBaseName(TypeBase type);
 
 typedef struct Type_t {
     TypePlural plural;

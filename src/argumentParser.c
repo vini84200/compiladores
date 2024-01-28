@@ -1,10 +1,12 @@
 #include "argumentParser.h"
 #include "errorHandler.h"
+#include "lib.h"
 #include <string.h>
 
 void parseFlag(char *flag, Args *args) {
     if (strcmp(flag, "-d") == 0 || strcmp(flag, "--debug") == 0) {
         args->debug = true;
+        debug = true;
     }
     else if (strcmp(flag, "-h") == 0 || strcmp(flag, "--help") == 0) {
         args->help = true;

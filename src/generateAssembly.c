@@ -4,7 +4,17 @@
 
 // Generate assembly code in AT&T syntax
 
-#define GEN_ASM(...) fprintf(output_file, __VA_ARGS__)
+// TODO: Consider using .comm when the variable is not initialized
+// TODO: Usar mapeamento de registradores para variáveis locais e escopos para manter esse mapa
+// Usar uma lista linkada global com os escopos
+// Quando entrar em um escopo, adicionar ele na lista, como copia do anterior
+// Quando sair de um escopo, remover ele da lista, e dar merge no anterior, fazendo o merge do mapa de registradores,
+// atualizando quem aponta para quem, e liberando os registradores que não são mais usados
+// TODO: Permitir a escrita para parametros
+
+
+#define GEN_ASM(...) fprintf(output_file, ##__VA_ARGS__)
+#define COMMENT(text, ...) if (debug) {GEN_ASM("/* " text "*/\n", ##__VA_ARGS__);}
 
 HashEntry *format_string_int;
 HashEntry *format_string_char;
@@ -286,9 +296,11 @@ void generateFunctions(TacList *tac, FILE *output_file) {
                 break;
             case TAC_BEGFUN:
                 current_function = t->src[0];
-                // Define the function parameters offsets
+                COMMENT("Function %s", current_function->value);
+                COMMENT("Function parameters offsets:")
                 setFunctionParametersOffsets(t->src[0], output_file);
                 GEN_ASM("%s:\n", t->src[0]->value);
+                COMMENT("Function prologue")
                 GEN_ASM("push %%ebp\n");
                 GEN_ASM("mov %%esp, %%ebp\n");
                 // TODO: Check if the function has local variables to allocate
@@ -296,10 +308,10 @@ void generateFunctions(TacList *tac, FILE *output_file) {
                 GEN_ASM("push %%ebx\n");
                 GEN_ASM("push %%esi\n");
                 GEN_ASM("push %%edi\n");
+                COMMENT("Function body")
                 break;
             case TAC_ENDFUN:
-                // There is no return value, so move a random value to the eax register
-                GEN_ASM("mov $251, %%eax\n");
+                COMMENT("Function epilogue")
                 // Pop the registers that were used
                 GEN_ASM("pop %%edi\n");
                 GEN_ASM("pop %%esi\n");
@@ -310,7 +322,7 @@ void generateFunctions(TacList *tac, FILE *output_file) {
                 // Restore the previous frame pointer
                 GEN_ASM("pop %%ebp\n");
                 // Return
-                GEN_ASM("ret\n");
+                GEN_ASM("ret\n\n\n");
                 current_function = NULL;
                 break;
             case TAC_ARG:
@@ -321,13 +333,28 @@ void generateFunctions(TacList *tac, FILE *output_file) {
                 srcIntoRegister(t->src[0], output_file, "eax", current_function);
                 GEN_ASM("push %%eax\n");
                 break;
-            case TAC_CALL:
+            case TAC_CALL: {
+                // Get the arguments size
+                int args_size = t->src[0]->identifier->type->arg_list->arg_count * 4;
+                // Get the register saving spot
+                int register_saving_spot = args_size + 12;
+                // Save the registers that will be used in the place reserved for them
+                GEN_ASM("mov %%ebx, -%d(%%ebp)\n", register_saving_spot);
+                GEN_ASM("mov %%esi, -%d(%%ebp)\n", register_saving_spot - 4);
+                GEN_ASM("mov %%edi, -%d(%%ebp)\n", register_saving_spot - 8);
+
                 GEN_ASM("call %s\n", t->src[0]->value);
                 // The return value is in the eax register
                 GEN_ASM("mov %%eax, %s(,1)\n", t->dst->value);
                 // Pop the arguments from the stack
-                GEN_ASM("add $%d, %%esp\n", t->src[0]->identifier->type->arg_list->arg_count * 4);
+                GEN_ASM("add $%d, %%esp\n", args_size);
+                // Pop the registers that were used
+                GEN_ASM("pop %%edi\n");
+                GEN_ASM("pop %%esi\n");
+                GEN_ASM("pop %%ebx\n");
+
                 break;
+            }
             case TAC_RET:
                 // Move the return value to the eax register
                 srcIntoRegister(t->src[0], output_file, "eax", current_function);
@@ -390,6 +417,17 @@ void generateFunctions(TacList *tac, FILE *output_file) {
             case TAC_MAX:
                 ERROR("Invalid TAC operation MAX");
                 break;
+            case TAC_COMMENT:
+                COMMENT("%s", t->src[0]->value);
+                break;
+            case TAC_CONSUMED_TEMP:
+                // TODO:
+                break;
+            case TAC_WILL_CALL:
+                COMMENT("Function call %s", t->src[0]->value);
+                // Create space for the registers that will be saved
+                GEN_ASM("sub $12, %%esp\n"); // 3 registers * 4 bytes
+                break;
         }
     }
 }
@@ -398,12 +436,17 @@ void setFunctionParametersOffsets(HashEntry *fun, FILE *output_file) {
     ParamTypeList *param_list = fun->identifier->type->arg_list;
     ParamIterator *paramIterator = newParamIterator(param_list);
     int offset = 8;// The first parameter is at offset 8
+    if (paramIteratorDone(paramIterator)) {
+        COMMENT("No parameters");
+    }
     while (!paramIteratorDone(paramIterator)) {
         ParamType *param = getNextParam(paramIterator);
+        COMMENT("%s %s at %d", getTypeBaseName(param->type->base), param->symbol->value, offset);
         GEN_ASM(".set %s_at_%s, %d\n", param->symbol->value, fun->value, offset);
         // TODO: Calculate the offset based on the type size
         offset += 4;
     }
+
     destroyParamIterator(paramIterator);
 }
 

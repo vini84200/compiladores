@@ -15,6 +15,10 @@ int getLineNumber(void);
 int getCollumn(void);
 int isRunning(void);
 void initSymbolTable(void);
+#ifndef DEBUG_GLOBAL_DEF
+#define DEBUG_GLOBAL_DEF
+extern bool debug;
+#endif
 
 HashTable *getSymbolTable();
 
