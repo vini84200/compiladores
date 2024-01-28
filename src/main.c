@@ -10,6 +10,7 @@
 #include "argumentParser.h"
 #include "ast.h"
 #include "errorHandler.h"
+#include "generateAssembly.h"
 #include "generateCode.h"
 #include "lib.h"
 #include "logs.h"
@@ -49,14 +50,26 @@ int main(const int argc, char **argv) {
 
     INFO("Análise semântica concluída com sucesso!");
 
+    if (args.outputType == OUTPUT_TYPE_CHECK) {
+        return 0;
+    }
+
     INFO("Iniciando geração de codigo intermediario")
     TacList *code = generateCode(getAST());
     // printTACList(code);
     INFO("Código gerado com sucesso")
 
-    DEBUG("Código gerado:\n");
-    printCode(code, intermediateCodeFile);
+    if (args.outputType == OUTPUT_TYPE_INTERMEDIATE_CODE) {
+        printCode(code, intermediateCodeFile);
+        return 0;
+    }
 
+    if (args.outputType == OUTPUT_TYPE_ASSEMBLY) {
+        INFO("Iniciando geração de código assembly")
+        generateAssembly(code, getAST(), intermediateCodeFile);
+        INFO("Código assembly gerado com sucesso")
+    }
+    INFO("Encerrando programa...")
 
     destroyAST(getAST());
     setAST(NULL);

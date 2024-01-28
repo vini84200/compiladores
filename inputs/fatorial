@@ -1,0 +1,19 @@
+int start = 23;
+int main();
+int fat(int n);
+
+code main {
+    print "O fatorial de ";
+    start = input(int);
+    print " é ";
+    print fat(start);
+}
+
+code fat {
+    if (n < 2) {
+        return 1;
+    } else {
+        // print n;
+        return n * fat(n - 1);
+    }
+}

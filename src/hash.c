@@ -114,9 +114,20 @@ bool SymbolIteratorDone(SymbolIterator *iterator) {
 void destroySymbolIterator(SymbolIterator *iterator) {
     free(iterator);
 }
+
 HashEntry *makeTemp() {
     char *out = calloc(1, 512);
     static int currentTemp = 0;
-    sprintf(out, "__tmp_%d_", currentTemp++);
+    do {
+        sprintf(out, "__tmp_%d_", currentTemp++);
+    } while (hashFind(getSymbolTable(), out) != NULL);
     return hashInsert(getSymbolTable(), SYMBOL_TEMP_ID, out);
+}
+HashEntry *makeLabel() {
+    char *out = calloc(1, 512);
+    static int currentTemp = 0;
+    do {
+        sprintf(out, "__label_%d_", currentTemp++);
+    } while (hashFind(getSymbolTable(), out) != NULL);
+    return hashInsert(getSymbolTable(), SYMBOL_LABEL, out);
 }

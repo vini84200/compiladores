@@ -47,6 +47,7 @@ bool SymbolIteratorDone(SymbolIterator *iterator);
 void destroySymbolIterator(SymbolIterator *iterator);
 
 HashEntry *makeTemp();
+HashEntry *makeLabel();
 
 
 #endif// SCANNER_TEST_HASH_H

@@ -192,9 +192,9 @@ TacList *generateCodeCmds(TacList *code, AST *ast, TacList *childLists[]) {
 
             TacList *expr = childLists[0];
             HashEntry *res = getListDst(expr);
-            HashEntry *elseLabel = makeTemp();
+            HashEntry *elseLabel = makeLabel();
             elseLabel->type = SYMBOL_LABEL;
-            HashEntry *endLabel = makeTemp();
+            HashEntry *endLabel = makeLabel();
             endLabel->type = SYMBOL_LABEL;
 
             TacList *then = childLists[1];
@@ -226,9 +226,9 @@ TacList *generateCodeCmds(TacList *code, AST *ast, TacList *childLists[]) {
 
             TacList *expr = childLists[0];
             HashEntry *res = getListDst(expr);
-            HashEntry *repeatLabel = makeTemp();
+            HashEntry *repeatLabel = makeLabel();
             repeatLabel->type = SYMBOL_LABEL;
-            HashEntry *endLabel = makeTemp();
+            HashEntry *endLabel = makeLabel();
             endLabel->type = SYMBOL_LABEL;
             TacList *then = childLists[1];
 
@@ -331,10 +331,10 @@ TacList *generateCode(AST *ast) {
             TacList *prefix = createTacList();
             TacList *suffix = createTacList();
             // PREFIX
-            appendTacList(prefix, createTac(
-                                          TAC_LABEL,
-                                          NULL,
-                                          ast->symbol, NULL));
+//            appendTacList(prefix, createTac(
+//                                          TAC_LABEL,
+//                                          NULL,
+//                                          ast->symbol, NULL));
             appendTacList(prefix, createTac(
                                           TAC_BEGFUN,
                                           NULL,

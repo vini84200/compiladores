@@ -1,18 +1,48 @@
-int a = 3;
-int array[10] 2 3 4 5 6 7 8 9 10 11;
+int a = 2323;
+int array[14] 2 3 4 5 6 7 8 9 10 11;
 int main(int b);
+int d = 4;
 int fun();
 int outra(int x, int y);
+int floater();
 
 code main {
-    a = input(int);
-    while(a > (2 + 3)) {
-        print "Ok";
-        a = outra(a, -2);
+    a = 14;
+    while (a > 0) {
+        print a;
+        array[a] = input(int);
+        a = a - 1;
+    }
+    a = 0;
+    print "Array: ";
+    while (a < 14) {
+        print array[a];
+        a = a + 1;
     }
 
-    a = fun();
-    return 34;
+
+
+    print "Hello World!\n";
+    print "A is ";
+    print a;
+    print 4 + 5;
+    if ((a <= 2)) {
+        print "Ok\n";
+    } else {
+        print "Not Ok\n";
+    }
+    a = 10;
+    while(a > (2 + 3)) {
+        print "Loop com a =";
+        print a;
+        a = a - 1;
+    }
+
+    a = outra(5, 10);
+    print "Outra = ";
+    print a;
+    print "Should be 15\n";
+    return 0;
 }
 
 code fun {
@@ -29,3 +59,6 @@ code outra
     return x + y;
 }
 
+code floater {
+    return 314;
+}

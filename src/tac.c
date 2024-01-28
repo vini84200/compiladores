@@ -118,7 +118,6 @@ Tac *TacFIterBack(TacIterator *iter) {
 }
 
 bool TacFIterDone(TacIterator *iter) {
-    if (iter->current == NULL) return true;
     return (iter->current == NULL);
 }
 

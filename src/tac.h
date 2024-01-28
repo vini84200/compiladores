@@ -2,7 +2,7 @@
 #define TAC_HEADER
 
 #include "hash.h"
-#include <bits/types/FILE.h>
+#include <stdio.h>
 
 #define TAC_OPT_Gen(F, S) \
     F(TAC_SYMBOL)         \

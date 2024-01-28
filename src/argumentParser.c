@@ -9,6 +9,15 @@ void parseFlag(char *flag, Args *args) {
     else if (strcmp(flag, "-h") == 0 || strcmp(flag, "--help") == 0) {
         args->help = true;
     }
+    else if (strcmp(flag, "-c") == 0 || strcmp(flag, "--check") == 0) {
+        args->outputType = OUTPUT_TYPE_CHECK;
+    }
+    else if (strcmp(flag, "-i") == 0 || strcmp(flag, "--intermediate") == 0) {
+        args->outputType = OUTPUT_TYPE_INTERMEDIATE_CODE;
+    }
+    else if (strcmp(flag, "-a") == 0 || strcmp(flag, "--assembly") == 0) {
+        args->outputType = OUTPUT_TYPE_ASSEMBLY;
+    }
     else {
         ERROR("Invalid flag %s", flag);
     }
@@ -19,7 +28,8 @@ Args parseArgs(int argc, char **argv) {
         .debug = false,
         .help = false,
         .inputFile = NULL,
-        .outputFile = stderr,
+        .outputFile = stdout,
+        .outputType = OUTPUT_TYPE_ASSEMBLY
     };
     int pos = 0;
     for (int i = 1; i < argc; i++) {
