@@ -52,6 +52,12 @@ code fun {
         array[0] = array[0] - 1;
         array[array[0]] = array[0];
     }
+    if (array[0] == 0) {
+        return 0;
+    }
+    else {
+        return 2;
+    }
 }
 
 code outra 

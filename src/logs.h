@@ -30,11 +30,13 @@ typedef enum LogLevel_t {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
 static const char *logLevelString[L_MAX_LEVELS] = {
+        [0] = "INVALID",
         [L_DEBUG] = GREY "DEBUG" C_RESET,
         [L_INFO] = CYAN "INFO" C_RESET,
         [L_WARN] = YELLOW "WARN" C_RESET,
         [L_ERROR] = RED "ERROR" C_RESET,
-        [L_CRITICA] = WHITE_RED "CRITICAL" C_RESET};
+        [L_CRITICA] = WHITE_RED "CRITICAL" C_RESET
+};
 #pragma GCC diagnostic pop
 
 

@@ -14,7 +14,8 @@
 
 
 #define GEN_ASM(...) fprintf(output_file, ##__VA_ARGS__)
-#define COMMENT(text, ...) if (debug) {GEN_ASM("/* " text "*/\n", ##__VA_ARGS__);}
+#define COMMENT(text, ...) \
+    if (debug) { GEN_ASM("/* " text "*/\n", ##__VA_ARGS__); }
 
 HashEntry *format_string_int;
 HashEntry *format_string_char;
@@ -217,8 +218,11 @@ void generateFunctions(TacList *tac, FILE *output_file) {
             case TAC_DIV:
                 srcIntoRegister(t->src[0], output_file, "eax", current_function);
                 srcIntoRegister(t->src[1], output_file, "ebx", current_function);
+                GEN_ASM("push %%edx\n");
+                GEN_ASM("mov $0, %%edx\n");
                 GEN_ASM("idiv %%ebx, %%eax\n");
                 GEN_ASM("mov %%eax, %s(,1)\n", t->dst->value);
+                GEN_ASM("pop %%edx\n");
                 break;
             case TAC_LEQ:
                 srcIntoRegister(t->src[0], output_file, "eax", current_function);
@@ -248,7 +252,7 @@ void generateFunctions(TacList *tac, FILE *output_file) {
                 srcIntoRegister(t->src[0], output_file, "eax", current_function);
                 srcIntoRegister(t->src[1], output_file, "ebx", current_function);
                 GEN_ASM("cmp %%ebx, %%eax\n");
-                GEN_ASM("setne %%al\n");        // Set the lower byte of the eax register to 1 if the comparison is true
+                GEN_ASM("setne %%al\n");       // Set the lower byte of the eax register to 1 if the comparison is true
                 GEN_ASM("movzx %%al, %%eax\n");// Move the lower byte to the whole eax register
                 GEN_ASM("mov %%eax, %s(,1)\n", t->dst->value);
                 break;
@@ -256,7 +260,7 @@ void generateFunctions(TacList *tac, FILE *output_file) {
                 srcIntoRegister(t->src[0], output_file, "eax", current_function);
                 srcIntoRegister(t->src[1], output_file, "ebx", current_function);
                 GEN_ASM("cmp %%ebx, %%eax\n");
-                GEN_ASM("setge %%al\n");        // Set the lower byte of the eax register to 1 if the comparison is true
+                GEN_ASM("setge %%al\n");       // Set the lower byte of the eax register to 1 if the comparison is true
                 GEN_ASM("movzx %%al, %%eax\n");// Move the lower byte to the whole eax register
                 GEN_ASM("mov %%eax, %s(,1)\n", t->dst->value);
                 break;
@@ -397,9 +401,9 @@ void generateFunctions(TacList *tac, FILE *output_file) {
             case TAC_MOVE_ARRAY:
                 // Move value to array
                 // Syntax: MOVE_ARRAY src0: index, src1: value, dst: array
-                srcIntoRegister(t->src[0], output_file, "eax", current_function); // Index
-                srcIntoRegister(t->src[1], output_file, "edx", current_function); // Value
-                GEN_ASM("mov $%s, %%ebx\n", t->dst->value); // Array
+                srcIntoRegister(t->src[0], output_file, "eax", current_function);// Index
+                srcIntoRegister(t->src[1], output_file, "edx", current_function);// Value
+                GEN_ASM("mov $%s, %%ebx\n", t->dst->value);                      // Array
                 GEN_ASM("mov %%edx, (%%ebx, %%eax, 4)\n");
                 // TODO: Check the type of the array for the size
 
@@ -407,8 +411,8 @@ void generateFunctions(TacList *tac, FILE *output_file) {
             case TAC_LOAD_ARRAY:
                 // Load value from array
                 // Syntax: LOAD_ARRAY src0: array, src1: index, dst: value
-                GEN_ASM("mov $%s, %%ebx\n", t->src[0]->value); // Array
-                srcIntoRegister(t->src[1], output_file, "eax", current_function); // Index
+                GEN_ASM("mov $%s, %%ebx\n", t->src[0]->value);                   // Array
+                srcIntoRegister(t->src[1], output_file, "eax", current_function);// Index
                 GEN_ASM("mov (%%ebx, %%eax, 4), %%edx\n");
                 GEN_ASM("mov %%edx, %s(,1)\n", t->dst->value);
                 // TODO: Check if the destination is a parameter
@@ -426,7 +430,7 @@ void generateFunctions(TacList *tac, FILE *output_file) {
             case TAC_WILL_CALL:
                 COMMENT("Function call %s", t->src[0]->value);
                 // Create space for the registers that will be saved
-                GEN_ASM("sub $12, %%esp\n"); // 3 registers * 4 bytes
+                GEN_ASM("sub $12, %%esp\n");// 3 registers * 4 bytes
                 break;
         }
     }

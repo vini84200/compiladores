@@ -10,6 +10,7 @@
 #include "argumentParser.h"
 #include "ast.h"
 #include "errorHandler.h"
+#include "funcCode.h"
 #include "generateAssembly.h"
 #include "generateCode.h"
 #include "lib.h"
@@ -56,6 +57,37 @@ int main(const int argc, char **argv) {
 
     INFO("Iniciando geração de codigo intermediario")
     TacList *code = generateCode(getAST());
+
+    AST *functionDeclarations = getAST()->children[1];
+    ASTListIterator *it = createASTListIterator(functionDeclarations);
+    if (ASTIteratorDone(it)) {
+        ERROR("Nenhuma função encontrada")
+    } else {
+        INFO("Encontradas funções")
+    }
+    while (!ASTIteratorDone(it)) {
+        AST *function = getNextAST(it);
+        INFO("Gerando código para função %s", function->symbol->value);
+        FunctionCode *fc = generateFunctionCode(function->symbol, function->children[0]);
+        INFO("Código gerado com sucesso para função %s", function->symbol->value);
+        if (fc == NULL) {
+            ERROR("Código nulo")
+        } else {
+            if (fc->graphStart == NULL) {
+                ERROR("Graph start is null")
+            } else {
+
+                if (!checkGraphReturns(fc->graphStart)) {
+                    ERROR("Função %s não termina em todos os caminhos", function->symbol->value)
+                }
+                printGraph(fc->graphStart);
+            }
+        }
+    }
+
+    destroyASTListIterator(it);
+
+
     // printTACList(code);
     INFO("Código gerado com sucesso")
 

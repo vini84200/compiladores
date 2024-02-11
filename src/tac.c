@@ -141,7 +141,7 @@ void printTACList(TacList *list) {
 }
 
 void printCode(TacList *list, FILE *fileOut) {
-    INFO("Printing generated intermediate code");
+//    INFO("Printing generated intermediate code");
     TacIterator iter = createTacForwardIterator(list);
     while (!TacFIterDone(&iter)) {
         Tac *t = TacFIterNext(&iter);

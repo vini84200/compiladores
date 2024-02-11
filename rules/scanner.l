@@ -7,8 +7,8 @@
 // +--------------------------------------------------------------------------+
 //
 
-#include "src/scannerDefinitions.c"
-#include "src/errorHandler.h"
+#include "scannerDefinitions.c"
+#include "errorHandler.h"
 %}
 
 
