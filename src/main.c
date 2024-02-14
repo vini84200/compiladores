@@ -9,6 +9,7 @@
 #include "../generated/y.tab.h"
 #include "argumentParser.h"
 #include "ast.h"
+#include "callsGraph.h"
 #include "errorHandler.h"
 #include "funcCode.h"
 #include "generateAssembly.h"
@@ -60,6 +61,7 @@ int main(const int argc, char **argv) {
 
     AST *functionDeclarations = getAST()->children[1];
     ASTListIterator *it = createASTListIterator(functionDeclarations);
+    CallsGraph *callsGraph = createCallsGraph();
     if (ASTIteratorDone(it)) {
         ERROR("Nenhuma função encontrada")
     } else {
@@ -70,20 +72,51 @@ int main(const int argc, char **argv) {
         INFO("Gerando código para função %s", function->symbol->value);
         FunctionCode *fc = generateFunctionCode(function->symbol, function->children[0]);
         INFO("Código gerado com sucesso para função %s", function->symbol->value);
-        if (fc == NULL) {
-            ERROR("Código nulo")
-        } else {
-            if (fc->graphStart == NULL) {
-                ERROR("Graph start is null")
-            } else {
+        addFunction(callsGraph, function->symbol, fc->graphStart);
+    }
+    populateCallsGraph(callsGraph);
+    int nFunctions = callsGraph->nNodes;
+    INFO("Encontradas %d funções", nFunctions);
 
-                if (!checkGraphReturns(fc->graphStart)) {
-                    ERROR("Função %s não termina em todos os caminhos", function->symbol->value)
+    CallsGraphIterator *callsGraphIterator = createCallsGraphIterator(callsGraph);
+    while (hasNextCallsGraphNode(callsGraphIterator)) {
+        CallsGraphNode *node = nextCallsGraphNode(callsGraphIterator);
+        INFO("Analisando função %s", node->function->value);
+        if (node->directVarUsage == NULL) {
+            node->directVarUsage = getFunctionDirectVarUsage(node->startBlock, node->function);
+        }
+        node->completeVarUsage = createVarUsageList();
+        for (int i = 0; i < node->directVarUsage->nUsages; i++) {
+            addVarUsage(node->completeVarUsage, node->directVarUsage->usages[i]);
+        }
+        int nDependencies;
+        HashEntry **dependencies = getDependencies(callsGraph, node->function, &nDependencies);
+        for (int i = 0; i < nDependencies; i++) {
+            CallsGraphNode *dependency = getFunctionNode(callsGraph, dependencies[i]);
+            if (dependency->directVarUsage == NULL) {
+                dependency->directVarUsage = getFunctionDirectVarUsage(dependency->startBlock, dependency->function);
+            }
+            VarUsageIterator *it = createVarUsageIterator(dependency->directVarUsage);
+            it->filteroutLocal = true;
+            it->filteroutParam = true;
+            VarUsage *usage;
+            while ((usage = nextVarUsage(it)) != NULL) {
+                VarUsage *varUsage = getVarUsage(node->completeVarUsage, usage->var);
+                if (varUsage == NULL) {
+                    addVarUsage(node->completeVarUsage, usage);
+                } else {
+                    varUsage->isRead = varUsage->isRead || usage->isRead;
+                    varUsage->isWritten = varUsage->isWritten || usage->isWritten;
                 }
-                printGraph(fc->graphStart);
             }
         }
+        INFO("Análise de variáveis concluída para função %s", node->function->value);
+        printVarUsageList(node->completeVarUsage);
     }
+    freeCallsGraphIterator(callsGraphIterator);
+
+
+    printCallsGraph(callsGraph);
 
     destroyASTListIterator(it);
 

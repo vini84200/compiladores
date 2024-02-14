@@ -11,6 +11,9 @@ code main {
     while (a > 0) {
         print a;
         array[a] = input(int);
+        if (array[a] == 0) {
+            array[a] = 1;
+        }
         a = a - 1;
     }
     a = 0;
@@ -18,6 +21,7 @@ code main {
     while (a < 14) {
         print array[a];
         a = a + 1;
+        a = fun();
     }
 
 
@@ -50,6 +54,9 @@ code fun {
     while (array[0] > 0) {
         print "Ok";
         array[0] = array[0] - 1;
+        if (array[0] == 5) {
+            return 1;
+        }
         array[array[0]] = array[0];
     }
     if (array[0] == 0) {

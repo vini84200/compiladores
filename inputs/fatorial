@@ -1,4 +1,5 @@
 int start = 23;
+int count = 0;
 int main();
 int fat(int n);
 
@@ -7,9 +8,11 @@ code main {
     start = input(int);
     print " é ";
     print fat(start);
+    return 0;
 }
 
 code fat {
+    count = count + 1;
     if (n < 2) {
         return 1;
     } else {

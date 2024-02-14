@@ -24,4 +24,5 @@ FLEX_TARGET(Scanner rules/scanner.l ${CMAKE_CURRENT_BINARY_DIR}/scanner.c)
 ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
 
 
-add_executable(Compiladores ${CPP_SOURCES} ${C_SOURCES} ${BISON_Parser_OUTPUTS} ${FLEX_Scanner_OUTPUTS})
+add_executable(Compiladores ${CPP_SOURCES} ${C_SOURCES} ${BISON_Parser_OUTPUTS} ${FLEX_Scanner_OUTPUTS}
+        )
