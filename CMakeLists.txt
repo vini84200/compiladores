@@ -16,7 +16,6 @@ file(GLOB_RECURSE C_SOURCES "src/*.c")
 # Bison and Flex
 find_package(BISON)
 find_package(FLEX)
-find_package(Boost REQUIRED)
 
 include_directories(Parser ${CMAKE_CURRENT_BINARY_DIR})
 BISON_TARGET(Parser rules/parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.c DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/parser.h)
